@@ -1,0 +1,494 @@
+/**
+ * ============================================================================
+ * DESIGN TOKENS — Canadian Fish
+ * ============================================================================
+ * Extracted verbatim from the Hold'em Odds Engine app
+ * (holdem-odds-engine: src/styles/tokens.css, every per-component
+ * .module.css under src/components, and the design handoff README in
+ * "Hold'em Odds Engine/design_handoff_holdem_odds_engine/").
+ * Every raw value below appears in that source; nothing was invented.
+ *
+ * THE SYSTEM IS DARK-ONLY. There is no light theme in the source and none is
+ * defined here. Deep green felt surfaces, brass/gold accents, cream text,
+ * warm off-white card faces. Do not add a light mode.
+ *
+ * Three typographic voices (never mixed within one element):
+ *   - Bodoni Moda (serif)      display: titles, big numerals, card ranks
+ *   - IBM Plex Mono            every label, eyebrow, stat caption, log line
+ *   - Instrument Sans          body copy and row text
+ *
+ * See DESIGN_NOTES.md at the repo root for usage patterns and source refs.
+ * ============================================================================
+ */
+
+:root {
+  /* ==========================================================================
+     1. COLOR — BACKGROUNDS & SURFACES
+     Source: tokens.css, LeftColumn/RightColumn/PokerTable .module.css
+     ========================================================================== */
+
+  /* Page & panel grounds (darkest → lighter) */
+  --page-bg: #050e0a;        /* root/body background */
+  --panel-bg: #07130e;       /* right/results column, primary content ground */
+  --card-inset: #0a1a13;     /* inset stat cells inside hairline grids */
+  --scroll-track: #061009;   /* scrollbar track (global.css) */
+  --scroll-thumb: #1c4032;   /* scrollbar thumb */
+  --scroll-thumb-hover: #2e6752;
+
+  /* Felt ramp — the green table surface family */
+  --felt-darkest: #05130d;   /* column gradient bottom */
+  --felt-deep: #0a2a1e;      /* table gradient outer */
+  --felt-top: #123c2c;       /* column gradient top */
+  --felt-mid: #10402f;       /* table gradient middle */
+  --felt-light: #1a6247;     /* table gradient hot center */
+
+  /* Wooden rail (table edge) */
+  --rail-light: #3a2a12;
+  --rail-dark: #1d1408;
+
+  /* Signature surface gradients (used as-is in the source) */
+  --gradient-column: radial-gradient(120% 80% at 50% -10%, var(--felt-top) 0%, var(--felt-deep) 45%, var(--felt-darkest) 100%);
+  --gradient-felt: radial-gradient(70% 90% at 50% 32%, var(--felt-light) 0%, var(--felt-mid) 52%, var(--felt-deep) 100%);
+  --gradient-rail: linear-gradient(180deg, var(--rail-light), var(--rail-dark));
+  --gradient-section: linear-gradient(180deg, rgba(20, 52, 38, 0.5), rgba(7, 20, 14, 0.5));   /* SectionCard */
+  --gradient-strip: linear-gradient(180deg, rgba(24, 60, 44, 0.6), rgba(8, 22, 16, 0.5));     /* MadeHandStrip */
+
+  /* Dark translucent washes (recessed fields, pills, scrims) */
+  --wash-black-16: rgba(0, 0, 0, 0.16);   /* table row ground */
+  --wash-black-20: rgba(0, 0, 0, 0.2);    /* group rows, share rows */
+  --wash-black-28: rgba(0, 0, 0, 0.28);   /* chips */
+  --wash-black-32: rgba(0, 0, 0, 0.32);   /* formula block */
+  --wash-black-34: rgba(0, 0, 0, 0.34);   /* text inputs */
+  --wash-black-35: rgba(0, 0, 0, 0.35);   /* stacked-bar track */
+  --wash-felt-55: rgba(4, 16, 11, 0.55);  /* pot pill */
+  --wash-felt-65: rgba(4, 16, 11, 0.65);  /* mode switch */
+  --wash-felt-80: rgba(4, 16, 11, 0.8);   /* used-card scrim */
+  --wash-btn: rgba(5, 18, 12, 0.6);       /* secondary button / stepper ground */
+  --wash-slot-34: rgba(4, 18, 12, 0.34);  /* empty board slot */
+  --wash-slot-45: rgba(4, 18, 12, 0.45);  /* empty hero slot */
+  --wash-locked: rgba(3, 12, 8, 0.4);     /* locked slot */
+  --wash-danger-btn: rgba(30, 8, 8, 0.5); /* destructive button ground */
+  --wash-empty: rgba(10, 30, 21, 0.4);    /* empty-state panel */
+  --overlay-sticky: rgba(6, 17, 12, 0.94);/* sticky status strip (near-opaque) */
+
+  /* ==========================================================================
+     2. COLOR — ACCENT: THE BRASS RAMP
+     Primary accent family. Links, buttons, highlights, big numerals.
+     ========================================================================== */
+
+  --brass: #e8c66a;          /* primary accent, links, active labels */
+  --brass-bright: #f0d894;   /* highlights, hero emphasis, focus ring, glows */
+  --brass-pale: #f6e6bb;     /* large numerals, primary-button text */
+  --brass-mid: #b9922f;      /* gradient stop (bars, plaques) */
+  --brass-deep: #b58e28;     /* gradient stop (mode thumb) */
+  --brass-dim: #8a7130;      /* derivation indices, chevrons (decorative only) */
+  --gold-antique: #c9a227;   /* only via rgba(): column borders .2, spinner track .25 */
+
+  /* Brass alpha steps — borders & fills (recurring rgba(232,198,106,*)) */
+  --brass-a07: rgba(232, 198, 106, 0.07);  /* row hover */
+  --brass-a08: rgba(232, 198, 106, 0.08);  /* badge fill */
+  --brass-a10: rgba(232, 198, 106, 0.1);   /* faintest hairline, progress track */
+  --brass-a12: rgba(232, 198, 106, 0.12);  /* table header rule, hover fill */
+  --brass-a13: rgba(232, 198, 106, 0.13);  /* CALL verdict / hero-row fill */
+  --brass-a14: rgba(232, 198, 106, 0.14);  /* standard hairline (grids, panels) */
+  --brass-a16: rgba(232, 198, 106, 0.16);  /* win-tile gradient top, felt ring */
+  --brass-a18: rgba(232, 198, 106, 0.18);  /* section-card border */
+  --brass-a20: rgba(232, 198, 106, 0.2);   /* strip border */
+  --brass-a22: rgba(232, 198, 106, 0.22);  /* pot-pill border, bar gradient hi */
+  --brass-a28: rgba(232, 198, 106, 0.28);  /* control borders (buttons, inputs) */
+  --brass-a30: rgba(232, 198, 106, 0.3);   /* mode switch, win tile border */
+  --brass-a35: rgba(232, 198, 106, 0.35);  /* badge border */
+  --brass-a40: rgba(232, 198, 106, 0.4);   /* emphasis border (verdict, hero row) */
+  --brass-a45: rgba(232, 198, 106, 0.45);  /* primary button, card-back border */
+  --brass-a50: rgba(232, 198, 106, 0.5);   /* hero empty-slot dash, tray hover ring */
+  --gold-border-column: rgba(201, 162, 39, 0.2);   /* column divider */
+  --gold-spinner-track: rgba(201, 162, 39, 0.25);  /* spinner ring */
+
+  /* Brass-on-glass button gradients */
+  --gradient-btn-primary: linear-gradient(180deg, rgba(232, 198, 106, 0.22), rgba(232, 198, 106, 0.08));
+  --gradient-btn-primary-hover: linear-gradient(180deg, rgba(232, 198, 106, 0.36), rgba(232, 198, 106, 0.16));
+  --gradient-thumb: linear-gradient(180deg, var(--brass), var(--brass-deep));       /* mode-switch thumb */
+  --gradient-plaque: linear-gradient(180deg, var(--brass), var(--brass-mid));       /* seat name plaque */
+  --gradient-bar-win: linear-gradient(90deg, var(--brass-mid), var(--brass-bright));
+  --gradient-bar-fill: linear-gradient(90deg, rgba(232, 198, 106, 0.22), rgba(232, 198, 106, 0.05)); /* row bars */
+  --gradient-progress: linear-gradient(90deg, var(--brass-dim), var(--brass-bright));
+
+  /* ==========================================================================
+     3. COLOR — TEXT HIERARCHY (on dark grounds)
+     Brightest → faintest. AA notes in DESIGN_NOTES.md §Accessibility.
+     ========================================================================== */
+
+  --cream: #f3ecdd;          /* body text (global body color) */
+  --cream-warm: #eee3c8;     /* row labels, group names */
+  --parchment: #f0e5cb;      /* derivation & raw-count values (mono) */
+  --parchment-dim: #e6ddc4;  /* standings names */
+  --btn-text: #e0d5b8;       /* secondary-button text, <b> in body */
+  --btn-text-hover: #fff4d4; /* secondary-button hover text */
+  --link-hover: #f9ecc2;     /* link & math-toggle hover */
+  --gold-soft: #cbb173;      /* win-tile label, status-strip text */
+  --sage: #a8bfb2;           /* secondary body, derivation labels */
+  --sage-muted: #9db3a6;     /* tertiary, inactive mode label, opponent labels */
+  --sage-bright: #a0beaf;    /* only via rgba(): opponent share-bar stops .16/.03 */
+  --mist: #c9d8cf;           /* tie values, "equity needed" readout */
+  --mist-dim: #c8d8cd;       /* chip names, verdict detail */
+  --tie-label: #8fa79a;      /* neutral-tile labels */
+  --slate-green: #7d9a8a;    /* eyebrow labels (faintest AA-passing step) */
+  --slate-deep: #5f7a6c;     /* faint labels, column heads — FAILS AA small text */
+  --slate-faint: #4f6b5d;    /* footnote — FAILS AA small text */
+  --suppressed: #3f574a;     /* deliberately unavailable values — decorative only */
+  --ink-on-brass: #20180a;   /* active mode-switch label (dark text on brass) */
+  --ink-on-plaque: #0d2118;  /* seat-plaque text (dark text on brass gradient) */
+
+  /* ==========================================================================
+     4. COLOR — PLAYING CARDS
+     Warm off-white faces, near-black ink, muted casino red.
+     ========================================================================== */
+
+  --card-face-light: #fdfaf2;  /* face gradient top (canonical face color) */
+  --card-face-dark: #e9dfc9;   /* face gradient bottom (tray/seat cards) */
+  --card-face-mid: #eee4cf;    /* seat/mini card gradient bottom */
+  --card-face-board: #efe6d2;  /* board card gradient bottom */
+  --card-face-hero-hi: #fffdf6;/* hero card gradient top (brightest face) */
+  --card-face-hero-lo: #f0e7d3;/* hero card gradient bottom */
+  --card-ink: #16110c;         /* ♠ ♣ and black-suit rank glyphs */
+  --card-red: #b02a2a;         /* ♥ ♦ and red-suit rank glyphs */
+  --card-back-hi: #8a2b2b;     /* face-down back gradient top */
+  --card-back-lo: #5c1a1a;     /* face-down back gradient bottom */
+
+  --gradient-card-face: linear-gradient(160deg, var(--card-face-light), var(--card-face-dark));       /* tray */
+  --gradient-card-seat: linear-gradient(160deg, var(--card-face-light), var(--card-face-mid));        /* seat/mini */
+  --gradient-card-board: linear-gradient(160deg, var(--card-face-light) 0%, var(--card-face-board) 100%);
+  --gradient-card-hero: linear-gradient(160deg, var(--card-face-hero-hi) 0%, var(--card-face-hero-lo) 100%);
+  --gradient-card-back: linear-gradient(150deg, var(--card-back-hi), var(--card-back-lo));
+  --card-back-border: var(--brass-a45);
+
+  /* ==========================================================================
+     5. COLOR — STATES: DANGER / SUCCESS / NEUTRAL / WARNING
+     ========================================================================== */
+
+  /* Danger (losing, destructive, opponent-leads) */
+  --danger: #c98d8d;           /* lose labels */
+  --danger-bright: #e8b4b4;    /* lose values, FOLD text */
+  --danger-deep: #7a2626;      /* lose bar gradient start */
+  --danger-mid: #b84040;       /* lose bar gradient end */
+  --danger-hover: #c95a5a;     /* destructive button hover border */
+  --danger-btn-text: #e0a8a8;  /* destructive button text */
+  --danger-btn-text-hover: #ffd9d9;
+  --danger-caption: #a58080;   /* danger-tile captions */
+  --danger-a10: rgba(176, 42, 42, 0.1);   /* danger tile fill */
+  --danger-a13: rgba(176, 42, 42, 0.13);  /* FOLD verdict fill */
+  --danger-a28: rgba(176, 42, 42, 0.28);  /* leader-row border */
+  --danger-a30: rgba(176, 42, 42, 0.3);   /* danger tile border */
+  --danger-a40: rgba(176, 42, 42, 0.4);   /* destructive button / FOLD border */
+  --gradient-bar-lose: linear-gradient(90deg, var(--danger-deep), var(--danger-mid));
+
+  /* Success (idle/ready, high win rates) */
+  --success: #5fd6a0;          /* idle status dot (with glow) */
+  --success-soft: #8fd6ae;     /* high win-rate figures */
+
+  /* Neutral (ties, "neither good nor bad") */
+  --neutral-bar: #6b8377;      /* tie bar segment, non-hero standing rank */
+  --wash-white-03: rgba(255, 255, 255, 0.03);  /* neutral tile fill */
+  --hairline-white-06: rgba(255, 255, 255, 0.06); /* locked-slot border */
+  --hairline-white-07: rgba(255, 255, 255, 0.07); /* stacked-bar border */
+  --hairline-white-09: rgba(255, 255, 255, 0.09); /* neutral tile border */
+  --sheen-white-70: rgba(255, 255, 255, 0.7);  /* card top-edge inset sheen */
+  --sheen-white-80: rgba(255, 255, 255, 0.8);  /* hero card sheen */
+
+  /* Warning: the source has NO distinct orange/amber warning hue — brass IS
+     the warm attention color. Alias only; do not introduce a new hue. */
+  --warning: var(--brass);
+  --warning-bright: var(--brass-bright);
+
+  /* Focus ring (source: :focus-visible on slots, tray cards, rows) */
+  --focus-ring: var(--brass-bright);       /* outline: 2px solid; offset 2px (−2px inside rows) */
+
+  /* Hand-category dot scale, rarest→common index 0..9 (holdem-engine.js DOT) */
+  --dot-0: #4f6b5d;  --dot-1: #6b8377;  --dot-2: #7f9a7a;  --dot-3: #9fae6a;
+  --dot-4: #c2a95a;  --dot-5: #d8b652;  --dot-6: #e8c66a;  --dot-7: #f0d894;
+  --dot-8: #f7e6b4;  --dot-9: #ffffff;
+
+  /* ==========================================================================
+     6. TYPOGRAPHY
+     Load (index.html):
+     https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,600;0,6..96,700;0,6..96,900;1,6..96,400;1,6..96,600&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&display=swap
+     Body gets `text-wrap: pretty` and -webkit-font-smoothing: antialiased.
+     ========================================================================== */
+
+  --font-serif: 'Bodoni Moda', serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+
+  /* Type scale — every font-size observed in the source, grouped by voice.
+     MONO LABEL LADDER (uppercase + wide tracking, see --tracking-*): */
+  --font-size-colhead: 7.5px;   /* table column headers, stepper caption */
+  --font-size-eyebrow: 8px;     /* section eyebrows, raw-count keys */
+  --font-size-caption: 8.5px;   /* tile labels, badges, plaques, field labels */
+  --font-size-hint: 9px;        /* deck hints, counters, side notes */
+  --font-size-control: 9.5px;   /* buttons, status text, subtitles, footnote */
+  --font-size-mono-sm: 10px;    /* seat labels, odds column, deriv indices */
+  --font-size-mono-md: 11px;    /* chip values, group counts */
+  --font-size-mono-data: 11.5px;/* wins column (tabular-nums) */
+  --font-size-mono-lg: 12.5px;  /* table figures, derivation values (tabular-nums) */
+  --font-size-formula: 15px;    /* formula blocks, text inputs */
+  /* SANS BODY LADDER: */
+  --font-size-chip: 12px;       /* chip names, count units, share notes */
+  --font-size-body-sm: 13px;    /* group names, standings names */
+  --font-size-row: 13.5px;      /* table row labels */
+  --font-size-body: 14px;       /* body copy (empty state) */
+  /* SERIF DISPLAY LADDER: */
+  --font-size-serif-sm: 15px;   /* pot amount, tray card rank, standing rank */
+  --font-size-serif-md: 16px;   /* stepper count */
+  --font-size-serif-lg: 17px;   /* board-card rank corner */
+  --font-size-title: 19px;      /* section titles */
+  --font-size-title-lg: 20px;   /* made-hand name */
+  --font-size-stat-sm: 22px;    /* small stat values */
+  --font-size-stat-verdict: 23px; /* verdict word, hero-card rank corner */
+  --font-size-app-title: 25px;  /* product name */
+  --font-size-stat-md: 27px;    /* pot-odds readouts, empty-state headline */
+  --font-size-stat-lg: 33px;    /* ahead-now values */
+  --font-size-stat-xl: 34px;    /* outs count */
+  --font-size-stat-hero: 40px;  /* equity numerals (the biggest number on screen) */
+
+  /* Weights (per family: serif 400/600/700 + italic; mono 400/500/600; sans 400–700) */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line heights */
+  --leading-none: 1;         /* big numerals, ranks, verdicts */
+  --leading-display: 1.02;   /* app title */
+  --leading-stat: 1.05;      /* equity value (1.1 for 33px stats) */
+  --leading-tight: 1.1;
+  --leading-strip: 1.15;     /* made-hand name */
+  --leading-read: 1.3;       /* pot-odds readouts */
+  --leading-blurb: 1.45;     /* header blurb */
+  --leading-normal: 1.5;     /* derivation lines */
+  --leading-body: 1.6;       /* body copy */
+  --leading-formula: 1.7;    /* formula blocks */
+  --leading-footnote: 1.8;   /* footnotes */
+
+  /* Letter spacing (mono labels are ALWAYS uppercase + tracked; wider as type
+     gets smaller). Full observed set: .04/.1/.12/.13/.14/.15/.16/.18/.2/.22/.24em */
+  --tracking-body: 0.04em;     /* footnote, verdict word */
+  --tracking-label: 0.1em;     /* subtitles, table figures */
+  --tracking-plaque: 0.12em;
+  --tracking-button: 0.13em;   /* buttons, status text, blurbs */
+  --tracking-key: 0.14em;      /* raw-count keys, group hints */
+  --tracking-toggle: 0.15em;   /* math toggle */
+  --tracking-wide: 0.16em;     /* mode switch, column heads, badges */
+  --tracking-field: 0.18em;    /* field labels, pot label */
+  --tracking-wider: 0.2em;     /* tile labels, deck hint */
+  --tracking-widest: 0.22em;   /* hero caption, strip eyebrow */
+  --tracking-max: 0.24em;      /* section eyebrows */
+
+  /* ==========================================================================
+     7. SPACING
+     The source uses a dense 1px-granular ladder, not a 4/8 grid. Canonical
+     observed steps (px): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+     22 26, plus large one-offs 30 54 70. Named by value — pick the exact step
+     the pattern calls for; do not round to a coarser grid.
+     ========================================================================== */
+
+  --space-1: 1px;   --space-2: 2px;   --space-3: 3px;   --space-4: 4px;
+  --space-5: 5px;   --space-6: 6px;   --space-7: 7px;   --space-8: 8px;
+  --space-9: 9px;   --space-10: 10px; --space-11: 11px; --space-12: 12px;
+  --space-13: 13px; --space-14: 14px; --space-15: 15px; --space-16: 16px;
+  --space-17: 17px; --space-18: 18px; --space-19: 19px; --space-20: 20px;
+  --space-22: 22px; --space-26: 26px;
+  --space-30: 30px; /* empty-state x-padding */
+  --space-54: 54px; /* empty-state y-padding */
+  --space-70: 70px; /* results-column bottom padding (scroll runway) */
+
+  /* Frequent composites (source habits):
+     section card padding 17px 19px, margin-bottom 15px
+     results column padding 20px 26px 70px (stacked: 16px 14px 56px)
+     controls column padding 15px 18px 18px, gap 12px (stacked: 12px 14px 16px)
+     row padding 8px 11px · tile padding 13px 14px · strip padding 11px 15px */
+
+  /* ==========================================================================
+     8. RADII
+     ========================================================================== */
+
+  --radius-card-mini: 3px;  /* smallest cards (18×25, 20×28, 22×31), card backs */
+  --radius-card: 4px;       /* tray cards, seat slots */
+  --radius-slot: 6px;       /* board slots, share rows, thumb */
+  --radius-row: 7px;        /* table rows, hairline grids, group rows */
+  --radius-control: 8px;    /* buttons, inputs, steppers, formula blocks, hero slots */
+  --radius-verdict: 9px;    /* mode switch, verdict bar, board drag-ring */
+  --radius-tile: 10px;      /* stat tiles, made-hand strip */
+  --radius-ring: 11px;      /* hero drag-ring */
+  --radius-panel: 14px;     /* section cards, empty state */
+  --radius-pill: 999px;     /* badges, plaques, pot pill, chips, bars */
+  --radius-round: 50%;      /* table ellipse, dots, spinner */
+
+  /* ==========================================================================
+     9. BORDERS
+     Default: 1px solid <brass alpha> (see --brass-a* ladder).
+     Dashed 1px = empty/awaiting slot. 2px solid = focus ring & drag ring.
+     ========================================================================== */
+
+  --border-width: 1px;
+  --border-width-ring: 2px;   /* focus outlines, drag rings, spinner */
+  --border-hairline: 1px solid var(--brass-a14);   /* the workhorse divider */
+  --border-card: 1px solid var(--brass-a18);       /* section-card edge */
+  --border-control: 1px solid var(--brass-a28);    /* buttons & inputs */
+  --border-emphasis: 1px solid var(--brass-a40);   /* hero/CALL emphasis */
+  --border-empty-slot: 1px dashed var(--brass-a40);/* .5 alpha for hero slots */
+
+  /* ==========================================================================
+     10. SHADOWS & GLOWS
+     Deep soft drops on near-black; inset sheens on card faces; brass glows.
+     ========================================================================== */
+
+  --shadow-rail: 0 18px 40px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(232, 198, 106, 0.28) inset;
+  --shadow-felt: 0 10px 26px rgba(0, 0, 0, 0.6) inset;
+  --shadow-card-hero: 0 2px 0 rgba(255, 255, 255, 0.8) inset, 0 8px 18px rgba(0, 0, 0, 0.6);
+  --shadow-card-board: 0 2px 0 rgba(255, 255, 255, 0.7) inset, 0 5px 12px rgba(0, 0, 0, 0.5);
+  --shadow-card-tray: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 2px 5px rgba(0, 0, 0, 0.4);
+  --shadow-card-seat: 0 2px 6px rgba(0, 0, 0, 0.55);
+  --shadow-card-back: 0 2px 5px rgba(0, 0, 0, 0.5);
+  --shadow-card-hover: 0 8px 16px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(232, 198, 106, 0.5);
+  --shadow-thumb: 0 2px 6px rgba(0, 0, 0, 0.45);
+  --glow-ring-sm: 0 0 14px rgba(240, 216, 148, 0.7);   /* seat drag ring */
+  --glow-ring: 0 0 18px rgba(240, 216, 148, 0.65);     /* board drag ring */
+  --glow-ring-lg: 0 0 22px rgba(240, 216, 148, 0.7);   /* hero drag ring */
+  --glow-idle: 0 0 8px var(--success);                 /* idle status dot */
+
+  /* ==========================================================================
+     11. MOTION
+     Two signature curves + observed durations. JS-side rhythm constants
+     (not CSS): 90ms input debounce, 110ms progress throttle, 22ms tween tick,
+     460ms number-tween with ease-out cubic 1−(1−t)^3.
+     Global: prefers-reduced-motion collapses all animation to 0.01ms.
+     ========================================================================== */
+
+  --ease-deal: cubic-bezier(0.2, 1.1, 0.35, 1);   /* card deal pop (overshoots) */
+  --ease-slide: cubic-bezier(0.22, 1, 0.36, 1);   /* bars, thumb, hover lift */
+  --duration-hover: 0.13s;      /* tray-card hover lift */
+  --duration-progress: 0.18s;   /* progress-bar width (linear) */
+  --duration-reveal-fast: 0.26s;/* compact panel riseIn (ease) */
+  --duration-reveal: 0.3s;      /* panel riseIn, mode thumb */
+  --duration-deal: 0.4s;        /* card deal (Web Animations API) */
+  --duration-tween: 0.46s;      /* equity number tween (JS) */
+  --duration-bar: 0.5s;         /* distribution/share bar width */
+  --duration-spin: 0.7s;        /* spinner (linear infinite) */
+
+  /* Keyframes to define once globally (from global.css):
+     @keyframes spin  { to { transform: rotate(360deg) } }
+     @keyframes riseIn { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:none } } */
+
+  /* ==========================================================================
+     12. TEXTURE — GRAIN OVERLAYS
+     Full-bleed position:absolute; inset:0; pointer-events:none layers.
+     .07 on the felt/controls column, .05 on the results column.
+     ========================================================================== */
+
+  --grain-07: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.07'/%3E%3C/svg%3E");
+  --grain-05: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+
+  /* ==========================================================================
+     13. Z-INDEX (observed scale)
+     ========================================================================== */
+
+  --z-above: 1;    /* labels above a sliding thumb */
+  --z-seat: 3;     /* table seats */
+  --z-board: 4;    /* community board */
+  --z-hero: 5;     /* your hand */
+  --z-sticky: 20;  /* sticky status strip / persistent log header */
+
+  /* ==========================================================================
+     14. CARD TABLE EXTENSION — Canadian Fish semantic aliases
+     Every alias below DERIVES from the palette above (derivation noted).
+     ZERO new raw colors were needed: hero-brass → Team A, the source's
+     opponent-sage treatment → Team B, danger family → risky claims.
+     Never rely on team color alone — always pair with the seat label/team
+     letter (mirrors the source's plaque pattern).
+     ========================================================================== */
+
+  /* The table */
+  --table-felt: var(--felt-mid);                    /* ← felt ramp */
+  --table-felt-gradient: var(--gradient-felt);      /* ← gradient-felt */
+  --table-rail-gradient: var(--gradient-rail);      /* ← rail ramp */
+  --table-ring: var(--brass-a16);                   /* dashed inner felt ring */
+  --table-page-gradient: var(--gradient-column);    /* screen ground behind table */
+
+  /* Cards */
+  --card-face: var(--card-face-light);              /* ← card faces */
+  --card-face-gradient: var(--gradient-card-face);
+  --card-back: var(--card-back-hi);                 /* ← card back ramp */
+  --card-back-gradient: var(--gradient-card-back);
+  --card-aspect: 5 / 7;                             /* every card in the source is ≈5:7 */
+  /* Card size ladder (w × h, radius): hero 60×85 r8 · board 47×66 r6 ·
+     strip 26×36 r4 · seat 25×35 r4 · example 22×31 r3 · out 20×28 r3 ·
+     mini 18×25 r3 · tray fluid aspect 5/7 r4 */
+  --card-w-lg: 60px;  --card-h-lg: 85px;   /* your-hand scale */
+  --card-w-md: 47px;  --card-h-md: 66px;   /* board/center scale */
+  --card-w-sm: 25px;  --card-h-sm: 35px;   /* opponent-seat scale */
+  --card-w-xs: 18px;  --card-h-xs: 25px;   /* inline log/list scale */
+
+  /* Teams — seats 0,2,4 = Team A (warm brass = the source's hero treatment),
+     seats 1,3,5 = Team B (cool sage = the source's opponent treatment) */
+  --team-a: var(--brass);                           /* ← brass */
+  --team-a-text: var(--brass-bright);               /* ← brass-bright (hero fg) */
+  --team-a-fill: var(--brass-a13);                  /* row/seat wash ← brass-a13 */
+  --team-a-border: var(--brass-a40);                /* ← brass-a40 (hero row) */
+  --team-a-bar: linear-gradient(90deg, rgba(232, 198, 106, 0.28), rgba(232, 198, 106, 0.05)); /* ← hero share bar */
+  --team-b: var(--sage);                            /* ← sage */
+  --team-b-text: var(--sage-muted);                 /* ← sage-muted (opponent fg) */
+  --team-b-fill: rgba(160, 190, 175, 0.08);         /* ← sage-bright wash, between the source's .16/.03 stops */
+  --team-b-border: rgba(160, 190, 175, 0.3);        /* ← sage-bright @ the source's border-alpha step */
+  --team-b-bar: linear-gradient(90deg, rgba(160, 190, 175, 0.16), rgba(160, 190, 175, 0.03)); /* ← opponent share bar */
+
+  /* Turn & attention */
+  --turn-highlight: var(--brass-bright);            /* ← focus/drag-ring color */
+  --turn-glow: var(--glow-ring);                    /* ← board drag-ring glow */
+  --turn-glow-strong: var(--glow-ring-lg);          /* ← hero drag-ring glow */
+  --turn-ring: 2px solid var(--brass-bright);       /* ← drag-over ring recipe */
+  --thinking-spinner: var(--brass);                 /* ← spinner top color */
+  --idle-dot: var(--success);                       /* ← idle status dot + --glow-idle */
+
+  /* Claims (a claim is all-or-nothing: brass = safe/yours, danger = risk/lost) */
+  --claim-safe: var(--success);                     /* ← success (correct claim) */
+  --claim-safe-soft: var(--success-soft);           /* ← success-soft */
+  --danger-claim: var(--danger-mid);                /* ← danger-mid (bar-red) */
+  --danger-claim-text: var(--danger-bright);        /* ← danger-bright */
+  --danger-claim-fill: var(--danger-a10);           /* ← danger tile fill */
+  --danger-claim-border: var(--danger-a40);         /* ← FOLD verdict border */
+
+  /* Seat identity (the plaque pattern: dark ink on brass pill) */
+  --seat-plaque-gradient: var(--gradient-plaque);   /* ← plaque gradient */
+  --seat-plaque-ink: var(--ink-on-plaque);          /* ← ink-on-plaque */
+
+  /* Persistent public log (the sticky status-strip treatment) */
+  --log-bg: var(--overlay-sticky);                  /* ← sticky strip bg */
+  --log-border: var(--brass-a14);                   /* ← strip bottom border */
+  --log-text: var(--gold-soft);                     /* ← status text color */
+  --log-meta: var(--slate-green);                   /* ← eyebrow color */
+  --log-row-bg: var(--wash-black-16);               /* ← table-row ground */
+
+  /* Book/score pills (the pot-pill treatment) */
+  --score-pill-bg: var(--wash-felt-55);             /* ← pot pill bg */
+  --score-pill-border: var(--brass-a22);            /* ← pot pill border */
+  --score-value: var(--brass);                      /* ← pot amount color */
+}
+
+/* ============================================================================
+   BREAKPOINTS (custom properties cannot hold media queries — reference block)
+   Source: App/global/LeftColumn/RightColumn/DeckTray .module.css, useTableScale
+   ----------------------------------------------------------------------------
+   ≥1024px   Two-column app grid: clamp(500px, 41%, 690px) 1fr; height:100vh;
+             overflow:hidden; each column scrolls independently.
+   ≤1023px   Stacked single-scroll document: grid → block, columns join the
+             page flow, the status strip goes position:sticky to the viewport,
+             paddings tighten (results 16px 14px 56px; controls 12px 14px 16px).
+   ≥1024px and ≤820px tall   Short-desktop: column gap 12→9, padding tightens,
+             table transform-scales down against a height budget.
+   ≤479px    Narrow phones: deck-tray glyphs step down (rank 15→12px,
+             suit 11→9px), grid gaps 4→3px.
+   Fluid     The poker table keeps a fixed 560×322 design size below 560px of
+             available width and is transform-scaled (transform-origin: top
+             center) so proportions stay exact — see src/hooks/useTableScale.ts
+             in the source. Reuse this trick for the 6-seat Fish table at 375px.
+   ============================================================================ */
