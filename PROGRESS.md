@@ -128,3 +128,34 @@ Append-only log. One entry per phase: what was built, what was verified, proof, 
 **Left**: Phase 5 deliverables (research done in parallel, all sourced) → Phase 6 red team →
 prod deploy (MANUAL_TODO #2). Phase 6 polish notes: 568 kB chunk (code-split /practice + coach),
 pre-hand-fetch "No cards" transient, deduction difficulty mix, recall negative-floor taste call.
+
+---
+
+## Phase 5 — Club deliverables + content pages (2026-08-20) — COMPLETE
+
+**Research (4 parallel sourced reports in scratchpad/research/)**: Berkeley RSO registration/funding/
+space/recruitment/constraints (2026-27 windows); Literature strategy & conventions (pagat vs US-
+student traditions, Salahuddin convention, stalemate breaker); prior-art digital landscape (market
+unserved; bots+drills near-unique; license red-lines); campus clubs + fair tournament formats
+(duplicate/Swiss/BAM, Berkeley×Stanford poker chassis; verified NEGATIVE finding: no organized
+Literature tournament documented anywhere — a fabricated AI-summary claim caught and rejected).
+Every claim carries a source URL + access date 2026-08-20.
+
+**Built**
+- CLUB_PLAN.md (352 lines): mission, dated 2026-27 founding timeline, cadence, officer roles mapped
+  to the 4-signatory rule, real-numbers budget, recruitment, retention, risks — 61 source URLs, 11
+  UNVERIFIED items flagged for LEAD/ASUC.
+- EVENTS.md (468 lines): 11 event concepts with run-of-show, 3 runnable fair tournament formats
+  (Swiss/mirrored-deck Swiss teams/BAM w/ leak countermeasures), Berkeley×Stanford proposal with
+  logistics + ready-to-send outreach email — 56 source URLs.
+- `/learn`: 33-slide interactive walkthrough over a deterministic engine-replayed game (hit/miss/
+  legality/correct+opponent+void claims/claim-out pass/endgame/winner) + printable one-page rules
+  card (`/learn/rules-card`, @media print).
+- `/strategy`: fully attributed (14 sources, inline chips, single-source flags, low-provenance
+  source excluded), 6 sections + variants + 3 worked examples + bots box.
+
+**Verified**: 191/191 tests (4 new /learn script tests: engine replay ok, annotations synced,
+teaching order), typecheck 0, lint 0, build green; visual check of /learn, /strategy, /learn/
+rules-card in-browser (content matches RULES.md).
+
+**Left**: Phase 6 adversarial red team + polish → prod deploy (MANUAL_TODO #2).
