@@ -1,0 +1,23 @@
+# dependencies / build
+node_modules/
+dist/
+*.tsbuildinfo
+
+# secrets — repo is PUBLIC, never commit env files
+.env
+.env.*
+!.env.example
+
+# vercel / supabase local state
+.vercel/
+.supabase/
+
+# test artifacts
+playwright-report/
+test-results/
+coverage/
+
+# editor / os
+.DS_Store
+Thumbs.db
+*.log
