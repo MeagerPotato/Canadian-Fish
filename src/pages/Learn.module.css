@@ -1,0 +1,452 @@
+/**
+ * /learn walkthrough — slide chrome, seat ring, claim matrix, hands.
+ * Tokens only (src/styles/tokens.css). Mobile-first at 375px.
+ */
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin-bottom: var(--space-12);
+}
+
+.counter {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-control);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-stat-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-stat);
+  color: var(--cream);
+  margin-bottom: var(--space-10);
+}
+
+.accent {
+  color: var(--brass);
+  font-style: italic;
+}
+
+.lede {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  line-height: var(--leading-body);
+  color: var(--sage);
+  max-width: 560px;
+  margin-bottom: var(--space-16);
+}
+
+.list {
+  margin: 0;
+  padding-left: var(--space-18);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-normal);
+  color: var(--cream-warm);
+}
+
+.list li::marker {
+  color: var(--brass);
+}
+
+.list b {
+  color: var(--btn-text);
+}
+
+.slideWrap {
+  animation: riseIn var(--duration-reveal) ease both;
+}
+
+.slide {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------------------------------------------------------- seat ring --- */
+
+.ring {
+  position: relative;
+  height: 224px;
+  max-width: 420px;
+  margin: 0 auto var(--space-14);
+  width: 100%;
+  border: var(--border-hairline);
+  border-radius: var(--radius-panel);
+  background: var(--table-felt-gradient);
+  box-shadow: var(--shadow-felt);
+}
+
+.seat {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-6);
+  border-radius: var(--radius-control);
+  border: 1px solid transparent;
+  z-index: var(--z-seat);
+}
+
+.seatA {
+  background: var(--team-a-fill);
+  border-color: var(--team-a-border);
+}
+
+.seatB {
+  background: var(--team-b-fill);
+  border-color: var(--team-b-border);
+}
+
+.seatActive {
+  border: var(--turn-ring);
+  box-shadow: var(--turn-glow);
+}
+
+.seatTarget {
+  border: 1px dashed var(--brass-a50);
+}
+
+.seatOut {
+  opacity: 0.55;
+}
+
+.seatCount {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: var(--tracking-key);
+  text-transform: uppercase;
+  color: var(--mist);
+  white-space: nowrap;
+}
+
+.ringCenter {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-12);
+  border-radius: var(--radius-pill);
+  background: var(--score-pill-bg);
+  border: 1px solid var(--score-pill-border);
+}
+
+.scoreValue {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-serif-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--score-value);
+  line-height: var(--leading-none);
+  white-space: nowrap;
+}
+
+.scoreLabel {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--slate-green);
+}
+
+/* -------------------------------------------------------- action strip --- */
+
+.actionStrip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-11);
+  border-radius: var(--radius-row);
+  background: var(--log-bg);
+  border: 1px solid var(--log-border);
+  margin-bottom: var(--space-12);
+}
+
+.actionLine {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-control);
+  letter-spacing: var(--tracking-button);
+  text-transform: uppercase;
+  color: var(--log-text);
+}
+
+/* ---------------------------------------------------------- annotation --- */
+
+.annotation {
+  border: var(--border-card);
+  border-radius: var(--radius-panel);
+  background: var(--gradient-section);
+  padding: var(--space-14) var(--space-16);
+  margin-bottom: var(--space-12);
+}
+
+.annTitle {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-control);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: var(--space-7);
+}
+
+.annBody {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-body);
+  color: var(--cream-warm);
+}
+
+/* -------------------------------------------------------- claim matrix --- */
+
+.matrix {
+  border-radius: var(--radius-row);
+  overflow: hidden;
+  background: var(--wash-black-16);
+  margin-bottom: var(--space-12);
+}
+
+.matrixHead {
+  padding: var(--space-7) var(--space-11);
+  border-bottom: 1px solid var(--brass-a12);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+
+.matrixRow {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 14px minmax(0, 1fr) 16px;
+  gap: var(--space-7);
+  align-items: center;
+  padding: var(--space-4) var(--space-11);
+}
+
+.matrixRow:hover {
+  background: var(--brass-a07);
+}
+
+.matrixSaid {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono-sm);
+  letter-spacing: var(--tracking-label);
+  color: var(--sage-muted);
+}
+
+.matrixArrow {
+  color: var(--brass-dim);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono-sm);
+}
+
+.matrixActual {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono-sm);
+  letter-spacing: var(--tracking-label);
+  color: var(--parchment);
+}
+
+.matrixOpp {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono-sm);
+  letter-spacing: var(--tracking-label);
+  color: var(--danger-claim-text);
+}
+
+.matrixRight {
+  color: var(--claim-safe);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono-md);
+  text-align: right;
+}
+
+.matrixWrong {
+  color: var(--danger-claim-text);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono-md);
+  text-align: right;
+}
+
+/* --------------------------------------------------------------- hands --- */
+
+.hand {
+  margin-bottom: var(--space-11);
+}
+
+.handLabel {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  margin-bottom: var(--space-6);
+}
+
+.handLabelA {
+  color: var(--team-a-text);
+}
+
+.handLabelB {
+  color: var(--team-b-text);
+}
+
+.handCards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.cardPlain {
+  display: inline-flex;
+}
+
+.cardMarked {
+  display: inline-flex;
+  border-radius: var(--radius-card-mini);
+  outline: var(--border-width-ring) solid var(--brass-bright);
+  outline-offset: 1px;
+  box-shadow: var(--glow-ring-sm);
+}
+
+.handEmpty {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-hint);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--slate-green);
+}
+
+/* ------------------------------------------------------------ controls --- */
+
+.controls {
+  display: flex;
+  gap: var(--space-10);
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-12);
+}
+
+.controls > * {
+  flex: 1;
+}
+
+.nextBtn {
+  flex: 2;
+}
+
+.dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  justify-content: center;
+  margin-bottom: var(--space-10);
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-round);
+  border: 1px solid var(--brass-a28);
+  background: var(--wash-btn);
+  padding: 0;
+  cursor: pointer;
+}
+
+.dot:hover {
+  border-color: var(--brass);
+}
+
+.dotDone {
+  background: var(--brass-a20);
+  border-color: var(--brass-a40);
+}
+
+.dotActive {
+  background: var(--gradient-thumb);
+  border-color: var(--brass-bright);
+}
+
+.kbHint {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-hint);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--slate-deep);
+  margin-bottom: var(--space-16);
+}
+
+/* ------------------------------------------------------------- CTAs --- */
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+  margin-top: var(--space-4);
+}
+
+.ctaRow > * {
+  flex: 1 1 160px;
+}
+
+.bookGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-7);
+}
+
+.bookChip {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-hint);
+  letter-spacing: var(--tracking-key);
+  text-transform: uppercase;
+  padding: var(--space-5) var(--space-10);
+  border-radius: var(--radius-pill);
+  background: var(--wash-black-28);
+  border: 1px solid var(--brass-a14);
+  color: var(--mist-dim);
+}
+
+.bookA {
+  color: var(--brass-pale);
+  border-color: var(--brass-a35);
+  background: var(--brass-a08);
+}
+
+.bookB {
+  color: var(--sage-muted);
+  border-color: var(--team-b-border);
+  background: var(--team-b-fill);
+}
+
+.bookVoid {
+  color: var(--danger-caption);
+  border-color: var(--danger-a30);
+  background: var(--danger-a10);
+}
+
+@media (max-width: 419px) {
+  .ring {
+    height: 208px;
+  }
+
+  .seat {
+    padding: var(--space-3) var(--space-4);
+  }
+}
