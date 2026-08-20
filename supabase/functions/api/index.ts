@@ -57,32 +57,16 @@ const deps: Deps = {
   },
 
   async bumpRateLimit(bucket) {
-    // PostgREST cannot express an atomic upsert-increment without an RPC, so:
-    // fetch + version-guarded update (2 attempts) with an insert fallback. A
-    // rare interleaving can miscount by one, which is acceptable for limiting.
-    for (let attempt = 0; attempt < 2; attempt++) {
-      const { data } = await db.from('rate_limits').select('count').eq('bucket', bucket).maybeSingle()
-      if (!data) {
-        const ins = await db
-          .from('rate_limits')
-          .insert({ bucket, count: 1, window_start: new Date().toISOString() })
-        if (!ins.error) return 1
-        continue // lost the insert race — retry the update path
-      }
-      const prev = data.count as number
-      const upd = await db
-        .from('rate_limits')
-        .update({ count: prev + 1 })
-        .eq('bucket', bucket)
-        .eq('count', prev)
-        .select('count')
-      if (!upd.error && Array.isArray(upd.data) && upd.data.length === 1) return prev + 1
+    // Atomic upsert-increment inside Postgres (migration 0002). The previous
+    // read-modify-write let 80 concurrent requests through with zero 429s
+    // (SECURITY_REVIEW F2); this counts every caller exactly once.
+    const { data, error } = await db.rpc('bump_rate_limit', { p_bucket: bucket })
+    if (error || typeof data !== 'number') {
+      // Fail CLOSED: an unreadable limiter must not become an open door.
+      console.error('bump_rate_limit failed', error)
+      return Number.MAX_SAFE_INTEGER
     }
-    // Both CAS attempts raced: unguarded best-effort increment (documented above).
-    const { data } = await db.from('rate_limits').select('count').eq('bucket', bucket).maybeSingle()
-    const prev = data ? (data.count as number) : 0
-    await db.from('rate_limits').update({ count: prev + 1 }).eq('bucket', bucket)
-    return prev + 1
+    return data
   },
 
   async broadcast(topic, payloads) {

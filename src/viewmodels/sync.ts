@@ -1,19 +1,32 @@
 /**
  * Broadcast/version reconciliation — PROTOCOL.md §5, pure and unit-tested.
  *
- * - Broadcast snapshots apply iff strictly newer than the current version.
+ * SECURITY (SECURITY_REVIEW F1): the room broadcast channel is a public topic
+ * that anyone holding the (public) anon key can write to. Broadcast payloads are
+ * therefore UNTRUSTED and are never rendered and never advance our version —
+ * they are only a hint that the server may have newer state. Everything shown to
+ * the player comes from GET /state, which is keyed to our own playerToken.
+ *
+ * - A broadcast hint schedules an authoritative /state refetch when it claims a
+ *   version newer than the one /state last gave us.
  * - /state responses (authoritative) apply when not older (equal refreshes hand).
- * - A /state refetch is needed whenever new log entries could have changed my
- *   hand: a hit ask involving my seat, or any claim.
+ * - A /state refetch is also needed whenever new log entries could have changed
+ *   my hand: a hit ask involving my seat, or any claim.
  */
 import type { PublicEvent, Seat } from '../../lib/engine/index.ts'
 
 /** version of nothing-yet-loaded */
 export const NO_VERSION = -1
 
-/** Apply a broadcast payload only when it is strictly newer (stale ignored). */
-export function shouldApplyBroadcast(currentVersion: number, incomingVersion: number): boolean {
-  return incomingVersion > currentVersion
+/**
+ * Should an untrusted broadcast hint trigger an authoritative /state refetch?
+ *
+ * The hint's version is compared but never stored: a forged huge version costs
+ * at most one extra fetch, and can never wedge the client (F1/F3) because only
+ * /state advances `currentVersion`.
+ */
+export function shouldRefetchOnHint(currentVersion: number, hintVersion: number): boolean {
+  return hintVersion > currentVersion
 }
 
 /** Apply an authoritative /state response unless it is strictly older. */

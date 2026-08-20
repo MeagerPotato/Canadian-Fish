@@ -3,6 +3,7 @@
  * host-gated start. Testids per PROTOCOL §7.
  */
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import type { Seat } from '../../lib/engine/index.ts'
 import type { PublicRoomState } from '../api/types.ts'
 import { buildLobby, type LobbySeatVM } from '../viewmodels/lobby.ts'
@@ -124,7 +125,9 @@ export function LobbyView({ room, mySeat, onSwap, onStart }: LobbyViewProps) {
         </span>
       </div>
 
-      <p className={styles.botHint}>Practice rooms that fill empty seats with bots are coming in a later phase tonight.</p>
+      <p className={styles.botHint}>
+        Short a few players? Start a solo table against bots from <Link to="/practice/game">Practice</Link>.
+      </p>
     </div>
   )
 }

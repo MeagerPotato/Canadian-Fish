@@ -115,7 +115,8 @@
   font-size: var(--font-size-eyebrow);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
-  color: var(--slate-deep);
+  /* WCAG AA: --slate-deep measured 3.58:1 here (polish audit M4). */
+  color: var(--slate-green);
 }
 
 .footNote {

@@ -1,13 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import type { Card, PublicEvent, Seat } from '../../lib/engine/index.ts'
-import { NO_VERSION, handRefetchNeeded, shouldApplyBroadcast, shouldApplyFetch } from '../../src/viewmodels/sync.ts'
+import { NO_VERSION, handRefetchNeeded, shouldApplyFetch, shouldRefetchOnHint } from '../../src/viewmodels/sync.ts'
 
-describe('broadcast version gate', () => {
-  it('applies only strictly newer broadcast payloads', () => {
-    expect(shouldApplyBroadcast(NO_VERSION, 0)).toBe(true)
-    expect(shouldApplyBroadcast(5, 6)).toBe(true)
-    expect(shouldApplyBroadcast(5, 5)).toBe(false)
-    expect(shouldApplyBroadcast(5, 4)).toBe(false)
+describe('broadcast hints are untrusted (SECURITY_REVIEW F1)', () => {
+  it('refetches only when a hint claims something newer than authoritative state', () => {
+    expect(shouldRefetchOnHint(NO_VERSION, 0)).toBe(true)
+    expect(shouldRefetchOnHint(5, 6)).toBe(true)
+    expect(shouldRefetchOnHint(5, 5)).toBe(false)
+    expect(shouldRefetchOnHint(5, 4)).toBe(false)
+  })
+
+  it('a forged sky-high hint costs one fetch and cannot wedge future /state', () => {
+    // An attacker publishing version 1e9 on the public channel only makes us ask
+    // the server. Our version still comes from /state, so the next authoritative
+    // response (version 6) still applies — no permanent desync.
+    expect(shouldRefetchOnHint(5, 1_000_000_000)).toBe(true)
+    expect(shouldApplyFetch(5, 6)).toBe(true)
   })
 
   it('lets an authoritative fetch refresh at the same version but never regress', () => {

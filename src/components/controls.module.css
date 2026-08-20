@@ -9,8 +9,9 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-6);
-  height: 32px;
-  min-height: 32px;
+  /* 44px floor everywhere: six people on phones (polish audit M3). */
+  height: 44px;
+  min-height: 44px;
   border-radius: var(--radius-control);
   font-family: var(--font-mono);
   font-size: var(--font-size-control);

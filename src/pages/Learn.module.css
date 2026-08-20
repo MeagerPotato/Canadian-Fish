@@ -388,7 +388,8 @@
   font-size: var(--font-size-hint);
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  color: var(--slate-deep);
+  /* WCAG AA: --slate-deep measured 3.81:1 here (polish audit M4). */
+  color: var(--slate-green);
   margin-bottom: var(--space-16);
 }
 

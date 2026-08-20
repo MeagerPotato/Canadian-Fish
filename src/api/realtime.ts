@@ -1,11 +1,17 @@
 /**
  * Realtime subscription — PROTOCOL.md §4.
- * One public broadcast channel per room: `room:{CODE}`, one event type `room`,
- * payload = full PublicRoomState snapshot (idempotent). Clients never subscribe
- * to postgres_changes. Auto-retries with backoff when the channel drops.
+ * One public broadcast channel per room: `room:{CODE}`, one event type `room`.
+ * Clients never subscribe to postgres_changes. Auto-retries with backoff when
+ * the channel drops.
+ *
+ * SECURITY (SECURITY_REVIEW F1): this is a PUBLIC topic — anyone with the
+ * (public) anon key and the room code can publish to it. We therefore treat a
+ * message as nothing more than "the server may have state newer than version N"
+ * and deliberately DO NOT hand the payload to the app: the only thing that
+ * escapes this module is the claimed version number. Rendered state always comes
+ * from GET /state, which is authenticated by the caller's playerToken.
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import type { PublicRoomState } from './types.ts'
 
 let client: SupabaseClient | null = null
 
@@ -21,7 +27,11 @@ function getClient(): SupabaseClient {
 export type RealtimeStatus = 'connecting' | 'connected' | 'dropped'
 
 export interface RoomSubscriptionHandlers {
-  onRoom: (snapshot: PublicRoomState) => void
+  /**
+   * An untrusted "state may have advanced to `hintVersion`" nudge. Never treat
+   * it as data — the caller refetches /state to learn what actually happened.
+   */
+  onHint: (hintVersion: number) => void
   onStatus: (status: RealtimeStatus) => void
 }
 
@@ -68,8 +78,9 @@ export function subscribeRoom(code: string, handlers: RoomSubscriptionHandlers):
     handlers.onStatus('connecting')
     channel = supabase.channel(topic)
     channel.on('broadcast', { event: 'room' }, (message) => {
-      const payload = message.payload as PublicRoomState | undefined
-      if (payload && typeof payload.version === 'number') handlers.onRoom(payload)
+      // Read ONLY the version off an untrusted payload; discard everything else.
+      const version = (message.payload as { version?: unknown } | undefined)?.version
+      if (typeof version === 'number' && Number.isFinite(version)) handlers.onHint(version)
     })
     channel.subscribe((status) => {
       if (disposed) return

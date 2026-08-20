@@ -3,9 +3,14 @@
  *
  * - token in localStorage → GET /state immediately (reconnect target < 3 s);
  *   no token → join form.
- * - Subscribe to `room:{CODE}`; apply broadcast payloads iff version > current.
- * - Refetch /state on (re)subscribe and on visibility regain; refetch (debounced
- *   ~150 ms) when new log entries include a hit ask involving my seat or any claim.
+ * - Subscribe to `room:{CODE}`. Broadcasts are UNTRUSTED hints (public topic —
+ *   see SECURITY_REVIEW F1): a hint claiming a newer version only schedules an
+ *   authoritative GET /state. Nothing from a broadcast is ever rendered, and
+ *   only /state advances our version, so a forged payload can neither spoof the
+ *   table nor wedge the client.
+ * - Refetch /state on (re)subscribe and on visibility regain. Hint-driven
+ *   refetches are debounced ~150 ms and throttled to one in flight per 250 ms,
+ *   always with a trailing fetch so a burst still lands on the latest state.
  * - Heartbeat every 20 s while mounted.
  *
  * Mount the consuming component with `key={code}` — per-room state resets by
@@ -26,7 +31,7 @@ import {
 import { subscribeRoom } from '../api/realtime.ts'
 import { clearToken, getToken, saveName, saveToken } from '../api/storage.ts'
 import type { ClientAction, PublicRoomState } from '../api/types.ts'
-import { NO_VERSION, handRefetchNeeded, shouldApplyBroadcast, shouldApplyFetch } from '../viewmodels/sync.ts'
+import { NO_VERSION, shouldApplyFetch, shouldRefetchOnHint } from '../viewmodels/sync.ts'
 
 export type RoomStage = 'loading' | 'join' | 'ready' | 'notFound' | 'error'
 
@@ -56,6 +61,8 @@ export interface RoomController {
 
 const HEARTBEAT_MS = 20_000
 const REFETCH_DEBOUNCE_MS = 150
+/** Floor between hint-driven /state fetches, so broadcast spam can't storm us. */
+const REFETCH_MIN_INTERVAL_MS = 250
 
 export function useRoom(code: string): RoomController {
   const [stage, setStage] = useState<RoomStage>(() => (getToken(code) ? 'loading' : 'join'))
@@ -72,26 +79,16 @@ export function useRoom(code: string): RoomController {
   const seatRef = useRef<Seat | null>(null)
 
   /**
-   * Version-gated snapshot application. Returns true when the caller should
-   * schedule a hand refetch (new hand-affecting log entries in a broadcast).
+   * Apply an AUTHORITATIVE /state snapshot. This is the only path that renders
+   * room state or advances `versionRef` — broadcasts never reach it (F1).
    */
-  const applySnapshot = useCallback(
-    (next: PublicRoomState, source: 'broadcast' | 'fetch', nextHand?: Card[]): boolean => {
-      const current = versionRef.current
-      const apply =
-        source === 'broadcast' ? shouldApplyBroadcast(current, next.version) : shouldApplyFetch(current, next.version)
-      if (!apply) return false
-      const prevLogLen = logLenRef.current
-      const nextLog = next.game?.log ?? []
-      versionRef.current = next.version
-      logLenRef.current = nextLog.length
-      setRoom(next)
-      if (nextHand) setHand(nextHand)
-      const mySeat = seatRef.current
-      return source === 'broadcast' && mySeat !== null && handRefetchNeeded(prevLogLen, nextLog, mySeat)
-    },
-    [],
-  )
+  const applySnapshot = useCallback((next: PublicRoomState, nextHand?: Card[]): void => {
+    if (!shouldApplyFetch(versionRef.current, next.version)) return
+    versionRef.current = next.version
+    logLenRef.current = next.game?.log.length ?? 0
+    setRoom(next)
+    if (nextHand) setHand(nextHand)
+  }, [])
 
   const fetchState = useCallback(async () => {
     const token = getToken(code)
@@ -100,7 +97,7 @@ export function useRoom(code: string): RoomController {
     if (result.ok) {
       seatRef.current = result.data.you.seat
       setYou(result.data.you)
-      applySnapshot(result.data.room, 'fetch', result.data.hand)
+      applySnapshot(result.data.room, result.data.hand)
       setStage('ready')
     } else if (result.error.code === 'ROOM_NOT_FOUND') {
       setStage('notFound')
@@ -118,12 +115,22 @@ export function useRoom(code: string): RoomController {
   // Mount: initial fetch, realtime subscription, heartbeat, visibility resync.
   useEffect(() => {
     let refetchTimer: number | null = null
+    let lastFetchAt = 0
+    /**
+     * Coalescing, throttled resync. Many hints in a burst (a bot chain, or an
+     * attacker spamming the public channel) collapse into at most one fetch per
+     * REFETCH_MIN_INTERVAL_MS, and the trailing one always runs so we still land
+     * on the newest state.
+     */
     const scheduleRefetch = () => {
       if (refetchTimer !== null) return
+      const sinceLast = Date.now() - lastFetchAt
+      const delay = Math.max(REFETCH_DEBOUNCE_MS, REFETCH_MIN_INTERVAL_MS - sinceLast)
       refetchTimer = window.setTimeout(() => {
         refetchTimer = null
+        lastFetchAt = Date.now()
         void fetchState()
-      }, REFETCH_DEBOUNCE_MS)
+      }, delay)
     }
 
     // Kick off the initial /state fetch on the next tick (reconnect < 3 s).
@@ -132,8 +139,9 @@ export function useRoom(code: string): RoomController {
     }, 0)
 
     const unsubscribe = subscribeRoom(code, {
-      onRoom: (snapshot) => {
-        if (applySnapshot(snapshot, 'broadcast')) scheduleRefetch()
+      // Untrusted nudge: never rendered, never stored — just "go ask /state".
+      onHint: (hintVersion) => {
+        if (shouldRefetchOnHint(versionRef.current, hintVersion)) scheduleRefetch()
       },
       onStatus: (status) => {
         setRealtimeDown(status === 'dropped')

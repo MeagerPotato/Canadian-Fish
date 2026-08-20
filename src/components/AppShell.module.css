@@ -29,6 +29,10 @@
 .brand {
   text-decoration: none;
   color: var(--cream);
+  /* ≥44px tap target (polish audit M2) without changing the visual wordmark. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 
 .wordmark {

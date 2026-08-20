@@ -159,3 +159,49 @@ teaching order), typecheck 0, lint 0, build green; visual check of /learn, /stra
 rules-card in-browser (content matches RULES.md).
 
 **Left**: Phase 6 adversarial red team + polish → prod deploy (MANUAL_TODO #2).
+
+---
+
+## Phase 6 — Adversarial red team, fixes, and production deploy (2026-08-20) — COMPLETE
+
+**Red team (3 parallel agents, all executing real attacks/load, report-only)**
+- Security → [SECURITY_REVIEW.md](SECURITY_REVIEW.md): 1 High, 1 Medium, 5 Low/Info. Strong positive
+  results: hands never leak (7 live realtime frames + all 6 /state responses carry zero foreign hand
+  keys), no service key in bundle/source maps/`.env*`/full git history, RLS denies every direct
+  table op (42501), 256-bit tokens, seat spoofing ignored, XSS blocked end-to-end, 40 random joins →
+  40× 404, code space 887.5M.
+- Robustness → [STRESS_TEST.md](STRESS_TEST.md): no Critical/High. 100/200/**500** concurrent
+  all-bot games in-process → all finished, 0 invariant violations, ~15,400 moves/s, /action handler
+  p50 0.46 ms / p95 2.04 ms; live p50 724 ms / p95 971 ms, 0 5xx; 4,700 malformed requests → 0 500s;
+  bot-chain cap exact at 60; broadcast versions strictly ascending.
+- Polish → [POLISH_REVIEW.md](POLISH_REVIEW.md): no Critical/High. Zero console errors/warnings
+  anywhere, no horizontal scroll at 375/390/768/1280 on any page, all six drills keyboard-operable,
+  all states present, layout shift 0 px on hand/log updates. 4 Mediums found.
+
+**Fixed and re-verified (orchestrator)**
+- **F1 (High) — forged realtime broadcasts.** Confirmed the public topic accepts anon writes (my own
+  Phase-0 probe: 202 + delivery). Rewrote the sync path so broadcasts are *untrusted hints*: only
+  `payload.version` escapes `realtime.ts`, only authoritative `/state` renders or advances the
+  version, hint-driven refetches coalesced + throttled (250 ms, trailing). Live attack replayed:
+  forged score 99 never rendered, client not wedged, UI still tracked the server (9/9 log entries).
+  Also closes F3.
+- **F2 (Medium) — non-atomic rate limiter.** Migration 0002 adds `bump_rate_limit()` (atomic
+  upsert-increment, service_role only); edge fn **v4** calls it and fails closed. Verified twice
+  live: 75 concurrent /join counted as exactly 75; 45 concurrent /action → exactly 30 through,
+  15× 429 (was 0).
+- **Polish M1–M4.** Removed false "coming soon" lobby copy; brand link and all base buttons/scrub
+  raised to a 44 px floor; two AA-failing labels (3.81:1, 3.58:1) moved to `--slate-green`.
+
+**Gates re-run after all fixes** — 192/192 tests, typecheck 0, lint 0, 10,000-game fuzz
+(1,170,401 reduces) clean, 6,000-game bot table unchanged (hard>easy 999-0-1, hard>medium 59.3%),
+six-client Playwright e2e green vs live backend (38 iterations to 8/8 books, reload recovery
+266/269 ms, privacy scans clean).
+
+**Deployed to production**: linked to Vercel project `canadian-fish` under Big Potatos and deployed
+with `vercel --prod`. Live at **https://canadian-fish.vercel.app** — HTTP 200 on every route, assets
+200, `/api/*` rewrite reaching the edge function (health 200, unauthenticated `/state` 401), and a
+42/42 end-to-end game smoke run **through the production domain**. Supabase advisor: only the two
+expected INFO lints (RLS on with no client policies = the intended deny-all). Room hard-deletion
+proven by backdating a synthetic row and running the cron's exact predicate.
+
+**Left**: only the deferred Low items and club follow-ups in [MANUAL_TODO.md](MANUAL_TODO.md) #3/#4.
