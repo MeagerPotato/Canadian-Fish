@@ -46,3 +46,33 @@ Append-only log. One entry per phase: what was built, what was verified, proof, 
   */15) + `clean-rate-limits` live.
 
 **Left**: Phase 2 rooms (PROTOCOL.md contract → server + client agents → Playwright gate).
+
+---
+
+## Phase 2 — Multiplayer rooms (2026-08-20) — GATE 2 PASSED
+
+**Built**
+- PROTOCOL.md — full client⇄server contract (endpoints, broadcast, timings, rate limits, testids).
+- `server/` — portable Web-standard handlers behind a `Deps` interface: create/join/state/swap/
+  start/action/heartbeat/vote-bot/health, version-CAS persistence with retry, pause + 90 s
+  bot-substitution vote, per-IP/token rate limits, 32 KB body cap, input validation, CORS;
+  bot chain (placeholder bot, Phase 3 replaces internals). 32 in-memory server tests incl. a
+  payload-privacy walker.
+- Supabase Edge Function `api` v2 — the esbuild-bundled server deployed live (secrets stay
+  platform-side). `scripts/pack-edge.mjs` + `scripts/harness.mjs` (static + /api proxy).
+- Client — Home/Lobby/Table on the extracted token system: rotated seat ring, fanned hand, ask/
+  claim/pass/designate sheets, persistent log with claim reveals, paused/vote/disconnect states,
+  reconnect via localStorage token, realtime broadcast sync with version gating, heartbeat. 30
+  viewmodel tests. Placeholder /practice /learn /strategy pages. vercel.json rewrite for /api.
+
+**Verified (output printed in transcript)**
+- 134 unit tests green (72 engine + 32 server + 30 client), typecheck 0, lint 0.
+- Live smoke vs deployed backend: 42/42 assertions (create→join×5→start→states→hit→miss,
+  401/403/400 guards, broadcast versions 1..8 ascending, no hand keys anywhere public).
+- GATE 2 Playwright, six browser contexts vs live backend, twice by the build agent + once
+  first-party: complete UI-driven game to 8/8 books (45 and 57 iterations), mid-game force-reload
+  of one context per team restored hand+turn in 252–462 ms (< 3000 ms), and per-context network
+  scanning: `hand` only ever in the owner's own /state; 58–63 broadcast payloads structurally
+  hand-free; every other seat's exact hand serialization absent from each context's traffic.
+
+**Left**: Phase 3 bots → Phase 4 practice → Phase 5 club research/pages → Phase 6 red team → prod deploy.
