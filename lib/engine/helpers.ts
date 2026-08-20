@@ -1,7 +1,7 @@
 /**
  * Legal-move enumeration helpers (used by UI, bots, and the fuzzer's policy).
  */
-import type { Card, GameState, Seat } from './types.ts'
+import type { Card, GameState, Phase, RulesConfig, Seat } from './types.ts'
 import { ALL_BOOKS, ALL_CARDS, ALL_SEATS, cardBook, seatTeam } from './cards.ts'
 
 /**
@@ -20,6 +20,40 @@ export function legalAsks(s: GameState, seat: Seat): { target: Seat; card: Card 
   const out: { target: Seat; card: Card }[] = []
   for (const target of ALL_SEATS) {
     if (seatTeam(target) === seatTeam(seat) || s.hands[target].length === 0) continue
+    for (const card of askable) out.push({ target, card })
+  }
+  return out
+}
+
+/**
+ * The public-data subset a viewer needs to enumerate its own legal asks.
+ * `seatView(state, seat)` satisfies this structurally.
+ */
+export interface AskableView {
+  seat: Seat
+  hand: readonly Card[]
+  counts: readonly number[]
+  phase: Phase
+  turn: Seat
+  config: RulesConfig
+}
+
+/**
+ * legalAsks computed from a seat view alone (own hand + public counts/phase/turn).
+ * Produces exactly the same list, in the same order, as `legalAsks(state, seat)`
+ * for the state the view was projected from — a bot holding only a SeatView can
+ * therefore enumerate asks without ever touching hidden hands.
+ */
+export function legalAsksFromView(v: AskableView): { target: Seat; card: Card }[] {
+  if (v.phase !== 'playing' || v.turn !== v.seat) return []
+  if (v.hand.length === 0) return []
+  const myBooks = new Set(v.hand.map(cardBook))
+  const held = new Set(v.hand)
+  const allowOwn = v.config.toggles.askOwnCardAllowed
+  const askable = ALL_CARDS.filter((c) => myBooks.has(cardBook(c)) && (allowOwn || !held.has(c)))
+  const out: { target: Seat; card: Card }[] = []
+  for (const target of ALL_SEATS) {
+    if (seatTeam(target) === seatTeam(v.seat) || v.counts[target] === 0) continue
     for (const card of askable) out.push({ target, card })
   }
   return out
