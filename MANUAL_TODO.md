@@ -19,3 +19,23 @@ and how long it takes. Empty sections mean nothing is blocked there yet.
      Node adapter documented in DESIGN of `server/` (Web-standard handlers, ~30 lines of shim),
      remove the rewrite from `vercel.json`, redeploy. ~20 minutes.
    - *Nothing is blocked* if you skip this — it's an architecture-preference item.
+
+2. **Create the Vercel project (≈2 minutes) — the ONE step needed to put the site live.**
+   - *What is blocked*: the production deploy to Vercel. Everything else shipped: the repo builds
+     clean, `vercel.json` (rewrite `/api/*` → the live Supabase edge function + SPA fallback) is
+     committed, the backend is already deployed and verified in production, and the full app was
+     gate-tested end-to-end against it (six-browser Playwright run, local build + live backend).
+   - *Why*: no autonomous path existed tonight. The Vercel MCP connector's grant can list the
+     `Big Potatos` team but returns 403 `forbidden` for project creation on both the team and
+     personal scope (tested both APIs); there is no `vercel` CLI login or `VERCEL_TOKEN` on this
+     machine; and no logged-in browser session was available overnight.
+   - *Exactly what to do* (either path):
+     - **Dashboard**: vercel.com → team `Big Potatos` → Add New → Project → Import
+       `MeagerPotato/Canadian-Fish` → framework auto-detects Vite, keep all defaults (no env vars
+       are needed — the client config is baked in and the API secret lives in Supabase) → Deploy.
+       Pushes to `main` then auto-deploy production.
+     - **CLI**: `npm i -g vercel && vercel login`, then from `C:\Projects\fish`:
+       `vercel link --project canadian-fish` (scope `friedtofuzs-projects`) and `vercel --prod`.
+   - *Verify*: open `https://canadian-fish.vercel.app` (or the assigned domain) → create a room on
+     your phone, join from a second device, play a turn. Should just work; the backend it talks to
+     is the same one all the gates ran against.
