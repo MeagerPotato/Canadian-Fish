@@ -4,7 +4,7 @@
  * loading skeletons, banners, and the vote UI (PROTOCOL §5).
  */
 import { useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { loadName } from '../api/storage.ts'
 import { useRoom } from '../hooks/useRoom.ts'
 import { DisconnectedBanner, ErrorBanner, PausedBanner, VoteBanner } from '../components/Banners.tsx'
@@ -45,6 +45,10 @@ function RoomInner({ code }: { code: string }) {
     voteBot,
   } = useRoom(code)
 
+  // Practice coach overlay (SPEC §8.6): opt-in via ?coach=1, additive only.
+  const [searchParams] = useSearchParams()
+  const coach = searchParams.get('coach') === '1'
+
   const mySeat = you?.seat ?? null
   const showPaused = room !== null && room.paused
   const showVoteOnly = room !== null && !room.paused && room.pendingVote !== null
@@ -72,10 +76,10 @@ function RoomInner({ code }: { code: string }) {
         if (room.status === 'lobby' || !room.game || !you) {
           return <LobbyView room={room} mySeat={mySeat} onSwap={(a, b) => void swapSeats(a, b)} onStart={() => void startGame()} />
         }
-        return <TableView room={room} game={room.game} you={you} hand={hand} act={act} />
+        return <TableView room={room} game={room.game} you={you} hand={hand} act={act} coach={coach} />
       }
     }
-  }, [stage, code, room, you, hand, mySeat, joinBusy, joinError, join, retry, act, swapSeats, startGame])
+  }, [stage, code, room, you, hand, mySeat, joinBusy, joinError, join, retry, act, swapSeats, startGame, coach])
 
   return (
     <div className={styles.page}>

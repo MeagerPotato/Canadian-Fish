@@ -64,6 +64,18 @@ export async function apiCreateRoom(name: string): Promise<ApiResult<CreateRoomR
   return ensure(result, (d) => typeof d.code === 'string' && typeof d.playerToken === 'string')
 }
 
+/** Practice rooms (PROTOCOL §3): fill seats 1..fillBots with bots at a difficulty. */
+export async function apiCreateRoomWithBots(
+  name: string,
+  fillBots: number,
+  botDifficulty: 'easy' | 'medium' | 'hard',
+): Promise<ApiResult<CreateRoomResponse>> {
+  const body: Record<string, unknown> = { fillBots, botDifficulty }
+  if (name.trim()) body.name = name.trim()
+  const result = await post<CreateRoomResponse>('/create-room', body)
+  return ensure(result, (d) => typeof d.code === 'string' && typeof d.playerToken === 'string')
+}
+
 export async function apiJoin(code: string, name: string, token?: string | null): Promise<ApiResult<JoinResponse>> {
   const body: Record<string, string> = { code }
   if (name.trim()) body.name = name.trim()

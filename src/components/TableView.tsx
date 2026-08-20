@@ -15,6 +15,7 @@ import { latestLine } from '../viewmodels/log.ts'
 import { mustAct, turnPrompt } from '../viewmodels/table.ts'
 import { AskSheet } from './AskSheet.tsx'
 import { ClaimSheet } from './ClaimSheet.tsx'
+import { CoachPanel } from './CoachPanel.tsx'
 import { GameOver } from './GameOver.tsx'
 import { HandFan } from './HandFan.tsx'
 import { LogPanel } from './LogPanel.tsx'
@@ -29,9 +30,11 @@ interface TableViewProps {
   you: { seat: Seat; name: string }
   hand: readonly Card[]
   act: (action: ClientAction) => Promise<ActOutcome>
+  /** ?coach=1 practice overlay (SPEC §8.6) — additive, off by default. */
+  coach?: boolean
 }
 
-export function TableView({ room, game, you, hand, act }: TableViewProps) {
+export function TableView({ room, game, you, hand, act, coach = false }: TableViewProps) {
   // A sheet request is pinned to the move it was opened on: any engine action
   // (moveIndex bump) or a lost precondition silently retires it — no effects.
   const [sheetReq, setSheetReq] = useState<{ kind: 'ask' | 'claim'; moveIndex: number } | null>(null)
@@ -165,6 +168,9 @@ export function TableView({ room, game, you, hand, act }: TableViewProps) {
 
         <div className={styles.right}>
           <LogPanel log={game.log} nameOf={nameOf} />
+          {coach && !finished && myTurn && (game.phase === 'playing' || game.phase === 'endgame') ? (
+            <CoachPanel game={game} mySeat={mySeat} hand={hand} nameOf={nameOf} />
+          ) : null}
         </div>
       </div>
 

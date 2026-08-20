@@ -103,3 +103,28 @@ Append-only log. One entry per phase: what was built, what was verified, proof, 
   returned the turn to the human, 0 void bot claims.
 
 **Left**: Phase 4 practice drills → Phase 5 → Phase 6 → prod deploy (MANUAL_TODO #2).
+
+---
+
+## Phase 4 — Practice drills (2026-08-20) — GATE 4 PASSED
+
+**Built**
+- `/practice` hub + six keyboard-driven drills (≤60 s rounds, seeded deterministic, score + PB in
+  localStorage + accuracy/speed/streak readouts): recall, ask-legality (every RULES §2 violation
+  class each round, rule revealed per answer), deduction (bot-game replay with scrub + certainty-
+  only questions + templated "why" from the Knowledge object), claim trainer (engine-verified
+  fully-locatable positions), card counting, and full-game vs bots (real server solo room via
+  fillBots, difficulty choice).
+- Coach overlay (`?coach=1`): top-3 `rankAsks` with reasons + refined hit %, certain-claim hint —
+  computed client-side from public view + own hand only; docked below the log; additive only.
+
+**Verified (output printed in transcript)**
+- First-party: typecheck 0, lint 0, 187/187 tests (34 drill tests listed verbatim: deterministic
+  generators, legality labels ≡ engine codes, 50-seed deduction ground truth, claim puzzles
+  engine-verified, conservation, PB semantics), build green.
+- Build agent additionally re-ran the live six-client e2e once after its table edits: 1 passed
+  (1.6 m), privacy scans clean, reload recovery 265/379 ms.
+
+**Left**: Phase 5 deliverables (research done in parallel, all sourced) → Phase 6 red team →
+prod deploy (MANUAL_TODO #2). Phase 6 polish notes: 568 kB chunk (code-split /practice + coach),
+pre-hand-fetch "No cards" transient, deduction difficulty mix, recall negative-floor taste call.

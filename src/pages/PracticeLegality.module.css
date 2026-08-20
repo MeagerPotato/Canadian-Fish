@@ -1,0 +1,200 @@
+/* Ask legality drill — proposition panel, V/I calls, rule reveal. */
+
+.run {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.meta {
+  display: flex;
+  gap: var(--space-14);
+}
+
+.metaItem {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-control);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-14);
+  border: var(--border-card);
+  border-radius: var(--radius-panel);
+  background: var(--gradient-section);
+  padding: var(--space-17) var(--space-19);
+}
+
+.clock {
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--brass-a10);
+  overflow: hidden;
+}
+
+.clockFill {
+  height: 100%;
+  width: 100%;
+  background: var(--gradient-progress);
+  animation: legalityShrink linear forwards;
+}
+
+@keyframes legalityShrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.prop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  flex-wrap: wrap;
+}
+
+.propLead,
+.propFor {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-bold);
+  color: var(--cream);
+}
+
+.propTarget {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-plaque);
+  text-transform: uppercase;
+  color: var(--seat-plaque-ink);
+  background: var(--seat-plaque-gradient);
+  padding: var(--space-3) var(--space-9);
+  border-radius: var(--radius-pill);
+}
+
+.hand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.handCards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.answers {
+  display: flex;
+  gap: var(--space-10);
+  flex-wrap: wrap;
+}
+
+.callBtn {
+  flex: 1;
+  min-width: 150px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  border-radius: var(--radius-control);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-control);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-button);
+  text-transform: uppercase;
+}
+
+.callValid {
+  border: 1px solid var(--brass-a45);
+  background: var(--gradient-btn-primary);
+  color: var(--brass-pale);
+}
+
+.callValid:hover {
+  background: var(--gradient-btn-primary-hover);
+}
+
+.callInvalid {
+  border: 1px solid var(--danger-a40);
+  background: var(--wash-danger-btn);
+  color: var(--danger-btn-text);
+}
+
+.callInvalid:hover {
+  border-color: var(--danger-hover);
+  color: var(--danger-btn-text-hover);
+}
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: var(--tracking-wide);
+  color: inherit;
+  opacity: 0.7;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-card-mini);
+  padding: var(--space-1) var(--space-4);
+}
+
+.reveal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  border-radius: var(--radius-verdict);
+  padding: var(--space-13) var(--space-15);
+  animation: riseIn var(--duration-reveal-fast) ease both;
+}
+
+.revealRight {
+  background: var(--brass-a13);
+  border: 1px solid var(--brass-a40);
+}
+
+.revealWrong {
+  background: var(--danger-claim-fill);
+  border: 1px solid var(--danger-claim-border);
+}
+
+.revealWord {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-stat-verdict);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-body);
+  line-height: var(--leading-none);
+}
+
+.revealRight .revealWord {
+  color: var(--brass-pale);
+}
+
+.revealWrong .revealWord {
+  color: var(--danger-claim-text);
+}
+
+.revealVerdict {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-control);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--cream-warm);
+}
+
+.revealRule {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-normal);
+  color: var(--cream-warm);
+}
+
+.reveal button {
+  align-self: flex-start;
+}
