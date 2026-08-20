@@ -1,0 +1,110 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--gradient-column);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain-07);
+  pointer-events: none;
+}
+
+.header {
+  position: relative;
+  z-index: var(--z-above);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  padding: var(--space-15) var(--space-18);
+  border-bottom: 1px solid var(--gold-border-column);
+}
+
+.brand {
+  text-decoration: none;
+  color: var(--cream);
+}
+
+.wordmark {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-app-title);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-display);
+  color: var(--cream);
+}
+
+.accent {
+  color: var(--brass);
+  font-style: italic;
+}
+
+.nav {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.navLink,
+.navActive {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-10);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-control);
+  letter-spacing: var(--tracking-button);
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--sage-muted);
+  border-radius: var(--radius-control);
+}
+
+.navLink:hover {
+  color: var(--btn-text-hover);
+  background: var(--brass-a08);
+}
+
+.navActive {
+  color: var(--brass);
+  background: var(--brass-a08);
+  border: 1px solid var(--brass-a20);
+}
+
+.main {
+  position: relative;
+  z-index: var(--z-above);
+  flex: 1;
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
+  padding: var(--space-20) var(--space-16) var(--space-70);
+}
+
+.footer {
+  position: relative;
+  z-index: var(--z-above);
+  padding: var(--space-14) var(--space-18) var(--space-22);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-control);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--slate-green);
+  text-align: center;
+}
+
+@media (max-width: 479px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-12) var(--space-14);
+  }
+  .main {
+    padding: var(--space-16) var(--space-14) var(--space-54);
+  }
+}

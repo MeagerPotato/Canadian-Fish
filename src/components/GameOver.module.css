@@ -1,0 +1,118 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--wash-felt-80);
+  padding: var(--space-16);
+  overflow-y: auto;
+}
+
+.panel {
+  width: min(430px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+  border: var(--border-card);
+  border-radius: var(--radius-panel);
+  background: var(--gradient-section), var(--panel-bg);
+  padding: var(--space-26) var(--space-22);
+  text-align: center;
+  animation: riseIn var(--duration-reveal) ease both;
+}
+
+.verdict {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-stat-md);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-stat);
+}
+
+.won {
+  color: var(--brass-pale);
+}
+
+.lost {
+  color: var(--danger-bright);
+}
+
+.tie {
+  color: var(--mist);
+}
+
+.scoreLine {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-10);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-stat-sm);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.scoreA {
+  color: var(--team-a-text);
+}
+
+.scoreB {
+  color: var(--team-b);
+}
+
+.scoreSep {
+  color: var(--slate-green);
+  font-size: var(--font-size-serif-sm);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-1);
+  width: 100%;
+  background: var(--brass-a14);
+  border: 1px solid var(--brass-a14);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--card-inset);
+  padding: var(--space-9) var(--space-6);
+}
+
+.cellKey {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: var(--tracking-key);
+  text-transform: uppercase;
+  color: var(--slate-green);
+  white-space: nowrap;
+}
+
+.cellVal {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-title-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-none);
+}
+
+.valA {
+  color: var(--team-a);
+}
+
+.valB {
+  color: var(--team-b);
+}
+
+.valVoid {
+  color: var(--slate-green);
+}
+
+.again {
+  width: 100%;
+}

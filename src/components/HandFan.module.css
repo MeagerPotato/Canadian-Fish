@@ -1,0 +1,103 @@
+.wrap {
+  position: relative;
+  border-radius: var(--radius-panel);
+  border: var(--border-card);
+  background: var(--gradient-strip);
+  padding: var(--space-10) var(--space-12) var(--space-12);
+}
+
+.attention {
+  border: var(--turn-ring);
+  box-shadow: var(--turn-glow);
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-8);
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--slate-green);
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono-sm);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.scroller {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-top: var(--space-16);
+  padding-bottom: var(--space-4);
+  scrollbar-width: thin;
+}
+
+.fan {
+  display: flex;
+  align-items: flex-end;
+  width: max-content;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.cardBtn {
+  position: relative;
+  flex: none;
+  border-radius: var(--radius-control);
+  transform-origin: bottom center;
+  transition: transform var(--duration-hover) var(--ease-slide);
+}
+
+.cardBtn + .cardBtn {
+  margin-left: -26px;
+}
+
+.cardBtn.groupStart {
+  margin-left: var(--space-8);
+}
+
+.cardBtn:hover,
+.lifted {
+  z-index: var(--z-above);
+}
+
+.lifted > span {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  border: var(--border-empty-slot);
+  border-radius: var(--radius-panel);
+  background: var(--wash-empty);
+  padding: var(--space-22) var(--space-30);
+  text-align: center;
+}
+
+.emptyWord {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--font-size-stat-md);
+  color: var(--brass);
+  line-height: var(--leading-none);
+}
+
+.emptyHint {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  color: var(--sage);
+}

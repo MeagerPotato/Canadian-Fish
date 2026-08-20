@@ -1,0 +1,248 @@
+.host {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  overflow: visible;
+}
+
+.box {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  transform-origin: top center;
+}
+
+.rail {
+  position: absolute;
+  inset: 12% 3% 8% 3%;
+  border-radius: var(--radius-round);
+  background: var(--table-rail-gradient);
+  box-shadow: var(--shadow-rail);
+  padding: var(--space-9);
+}
+
+.felt {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-round);
+  background: var(--table-felt-gradient);
+  box-shadow: var(--shadow-felt);
+}
+
+.ring {
+  position: absolute;
+  inset: var(--space-10);
+  border-radius: var(--radius-round);
+  border: 1px dashed var(--table-ring);
+  pointer-events: none;
+}
+
+.scorePill {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--score-pill-bg);
+  border: 1px solid var(--score-pill-border);
+  border-radius: var(--radius-pill);
+  padding: var(--space-6) var(--space-16);
+  z-index: var(--z-board);
+}
+
+.scoreEyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--log-meta);
+}
+
+.scoreLine {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-6);
+}
+
+.scoreTeamA,
+.scoreTeamB {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+}
+
+.scoreTeamA {
+  color: var(--team-a);
+}
+
+.scoreTeamB {
+  color: var(--team-b);
+}
+
+.scoreValue {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-stat-sm);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--score-value);
+  line-height: var(--leading-none);
+}
+
+.scoreDash {
+  color: var(--slate-green);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono-sm);
+}
+
+.chip {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: var(--z-seat);
+  width: 104px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-8);
+  border-radius: var(--radius-tile);
+  background: var(--wash-felt-65);
+}
+
+.chipA {
+  border: 1px solid var(--team-a-border);
+  border-left-width: 3px;
+  background: var(--team-a-fill);
+}
+
+.chipB {
+  border: 1px solid var(--team-b-border);
+  border-left-width: 3px;
+  background: var(--team-b-fill);
+}
+
+.chipYou {
+  z-index: var(--z-hero);
+}
+
+.chipGone .chipName,
+.chipGone .chipMeta {
+  opacity: 0.5;
+}
+
+.chipOut .chipName {
+  color: var(--sage-muted);
+}
+
+.turnRing {
+  position: absolute;
+  inset: -4px;
+  border: var(--turn-ring);
+  border-radius: var(--radius-ring);
+  box-shadow: var(--turn-glow);
+  pointer-events: none;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.chipTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.tag,
+.tagGone {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+}
+
+.tag {
+  color: var(--sage-muted);
+  border: 1px solid var(--hairline-white-09);
+}
+
+.tagGone {
+  color: var(--danger);
+  border: 1px solid var(--danger-a30);
+  background: var(--danger-a10);
+}
+
+.chipName {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-chip);
+  font-weight: var(--font-weight-semibold);
+  color: var(--cream-warm);
+  line-height: var(--leading-tight);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.you {
+  color: var(--brass);
+  font-weight: var(--font-weight-regular);
+}
+
+.chipMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.backs {
+  position: relative;
+  width: 22px;
+  height: 26px;
+  flex: none;
+}
+
+.back1,
+.back2 {
+  position: absolute;
+  top: 0;
+  left: var(--space-2);
+  width: var(--card-w-xs);
+  height: var(--card-h-xs);
+  border-radius: var(--radius-card-mini);
+  background: var(--card-back-gradient);
+  border: 1px solid var(--card-back-border);
+  box-shadow: var(--shadow-card-back);
+}
+
+.back1 {
+  transform: rotate(-7deg);
+}
+
+.back2 {
+  transform: rotate(7deg);
+}
+
+.outWord {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--font-size-body-sm);
+  color: var(--slate-green);
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono-lg);
+  font-variant-numeric: tabular-nums;
+  color: var(--parchment);
+}
+
+.countUnit {
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: var(--tracking-key);
+  text-transform: uppercase;
+  color: var(--slate-green);
+}

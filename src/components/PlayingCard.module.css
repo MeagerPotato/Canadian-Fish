@@ -1,0 +1,112 @@
+.card {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  background: var(--gradient-card-face);
+  color: var(--card-ink);
+  font-family: var(--font-serif);
+  line-height: var(--leading-none);
+  user-select: none;
+}
+
+.red {
+  color: var(--card-red);
+}
+
+.lg {
+  width: var(--card-w-lg);
+  height: var(--card-h-lg);
+  border-radius: var(--radius-control);
+  background: var(--gradient-card-hero);
+  box-shadow: var(--shadow-card-hero);
+}
+
+.md {
+  width: var(--card-w-md);
+  height: var(--card-h-md);
+  border-radius: var(--radius-slot);
+  background: var(--gradient-card-board);
+  box-shadow: var(--shadow-card-board);
+}
+
+.sm {
+  width: var(--card-w-sm);
+  height: var(--card-h-sm);
+  border-radius: var(--radius-card);
+  background: var(--gradient-card-seat);
+  box-shadow: var(--shadow-card-seat);
+}
+
+.xs {
+  width: var(--card-w-xs);
+  height: var(--card-h-xs);
+  border-radius: var(--radius-card-mini);
+  background: var(--gradient-card-seat);
+  box-shadow: var(--shadow-card-seat);
+}
+
+/* Corner glyph layout (lg/md): rank top-left, small suit under it, big suit
+   bottom-right (DESIGN_NOTES §1 Playing cards). */
+.cornerRank {
+  position: absolute;
+  top: var(--space-6);
+  left: var(--space-7);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-stat-verdict);
+}
+
+.md .cornerRank {
+  font-size: var(--font-size-serif-lg);
+  top: var(--space-4);
+  left: var(--space-5);
+}
+
+.cornerSuit {
+  position: absolute;
+  top: 30px;
+  left: var(--space-7);
+  font-size: var(--font-size-body-sm);
+}
+
+.md .cornerSuit {
+  top: 22px;
+  left: var(--space-5);
+  font-size: var(--font-size-mono-md);
+}
+
+.bigSuit {
+  position: absolute;
+  right: var(--space-6);
+  bottom: var(--space-4);
+  font-size: var(--font-size-stat-sm);
+  opacity: 0.9;
+}
+
+.md .bigSuit {
+  font-size: var(--font-size-serif-lg);
+  right: var(--space-4);
+  bottom: var(--space-3);
+}
+
+/* Small cards center rank over suit. */
+.centerRank {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-serif-sm);
+}
+
+.xs .centerRank {
+  font-size: var(--font-size-mono-md);
+}
+
+.centerSuit {
+  font-size: var(--font-size-mono-md);
+  margin-top: var(--space-1);
+}
+
+.xs .centerSuit {
+  font-size: var(--font-size-hint);
+  margin-top: 0;
+}

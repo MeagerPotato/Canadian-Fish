@@ -1,0 +1,36 @@
+.card {
+  border: var(--border-card);
+  border-radius: var(--radius-panel);
+  background: var(--gradient-section);
+  padding: var(--space-17) var(--space-19);
+  margin-bottom: var(--space-15);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin-bottom: var(--space-13);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-none);
+  color: var(--cream);
+}
+
+.sub {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-control);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--slate-green);
+  margin-top: var(--space-4);
+}
+
+.headRight {
+  flex: none;
+}
