@@ -45,12 +45,18 @@ Pinned because it is the easy thing to get wrong:
   log, and lobby metadata. **Never card identities from hands.**
 - Every mutation goes through `POST /api/action` with `{code, playerToken, action}`. The server loads
   the room with privileged credentials, validates via the pure engine, writes back with an optimistic
-  `version` CAS (`UPDATE … WHERE id=$1 AND version=$2`, retry on conflict), then broadcasts.
+  `version` CAS (update guarded on the current version, retry on conflict), then broadcasts.
 - Each client fetches **only its own hand** from `GET /api/state?code&token`, keyed by `playerToken`.
-- Server DB credential: preferred = Supabase secret/service key in Vercel env; fallback (no dashboard
-  access available to the build) = dedicated Postgres role `game_server` (login via Supavisor pooler,
-  allow-all RLS policies granted only to that role). Secret lives only in Vercel env vars and
-  `.env.local`; `.env*` is gitignored (repo is public). Which path was used is recorded in PROGRESS.md.
+- **Server host = Supabase Edge Function `api`** (Deno), fronted by a Vercel rewrite so the client
+  calls its own origin `/api/*`. The privileged credential (`SUPABASE_SERVICE_ROLE_KEY`) is
+  **platform-injected into the edge function by Supabase** — it never exists in this repo, the
+  client bundle, Vercel, or the build transcript. (The brief's literal "Vercel serverless functions"
+  host was not autonomously achievable: setting a Vercel env var requires an authenticated CLI/
+  dashboard session that does not exist tonight, and the permission layer rightly refuses plaintext
+  credential provisioning. The server-authoritative model, the `/api/*` surface, and every gate are
+  unchanged; see MANUAL_TODO for the optional migration back to Vercel-hosted functions.) Verified
+  2026-08-20: edge function reads `rooms` via service role (200), anon direct table access denied
+  (42501), REST broadcast + WS delivery round-trip works with anon.
 - Broadcast send path: server → Supabase Realtime REST broadcast (public channel `room:{code}`, topic
   guarded by room-code entropy; re-examined in Phase 6).
 - Room expiry: `pg_cron` job hard-deletes rooms with `last_activity < now() - interval '6 hours'`.
@@ -171,9 +177,10 @@ PROGRESS.md appended after every phase; MANUAL_TODO.md collects anything requiri
    opponent claims *all* remaining books alone, no consultation. RULES.md §4.
 3. **Practice full-game** uses a real server-side solo room rather than a client-side engine, so the
    thin-client rule is never violated. Drills 1–5 are pure client exercises (no hidden info exists).
-4. **Server DB credential**: no dashboard/CLI session is available to the overnight build, so the
-   build uses whichever privileged path is attainable non-interactively (see §2); swap to the
-   official service key later is a 5-minute env-var change, listed in MANUAL_TODO.md if applicable.
+4. **Server hosting**: authoritative logic ships as Supabase Edge Function `api` behind a Vercel
+   `/api/*` rewrite (see §2 for why and for the verification results). Handlers are written as
+   portable Web-standard `Request → Response` functions so moving them into Vercel functions later
+   is a shim + env-var task (MANUAL_TODO #1), not a rewrite.
 5. **Broadcast channel is public-topic** with room-code entropy as the guard; contains public state
    only, so a leak of the topic name leaks nothing hidden. Rate limiting + Phase 6 review cover
    brute-force.
