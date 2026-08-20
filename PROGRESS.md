@@ -21,3 +21,28 @@ Append-only log. One entry per phase: what was built, what was verified, proof, 
   Vercel MCP + Supabase MCP connectors are available and will be used instead (deploy, migrations).
 
 **Left**: Phases 1–6 per SPEC §9.
+
+---
+
+## Phase 1 — Rules engine + tests (2026-08-20) — GATE 1 PASSED
+
+**Built**
+- Vite + React + TS scaffold (React 19, Vite 8, TS 6, ESLint 10 flat config, Vitest 4).
+- `lib/engine/`: pure dependency-free reducer implementing RULES.md exactly — `newGame` (xmur3→mulberry32
+  seeded deal), `reduce` (ask/claim/pass/designate, all 16 error codes), `publicView`/`seatView`,
+  `checkInvariants`, `legalAsks`, toggles plumbed (askOwnCardAllowed + highBooksDouble fully live).
+- `tests/engine/`: 70 tests in 8 files — every §2 error code, §7 vectors 1–6, hit/miss/elimination,
+  claim-out pass, endgame designation, deferred endgame after pass, tie, determinism/replay/deep-freeze
+  immutability, view-leak regex, and the 10k-game fuzz.
+
+**Verified (output printed in transcript)**
+- `npm run typecheck` → exit 0; `npm run lint` (--max-warnings 0) → exit 0.
+- `npm test` → 70/70 passing. Fuzz: 10,000 seeded games, 1,170,401 reduces (117 avg/game),
+  `checkInvariants` after every reduce, every game finished with exactly 8 books resolved
+  (score+voids=8, hands empty), 9.5 s.
+- Supabase infra (done during Phase 1 build): anon SELECT/INSERT on `rooms` → 42501 denied;
+  realtime REST broadcast 202 + WS delivery received; edge function `api` /health reads DB via
+  platform-injected service role → 200 (401 without JWT); cron jobs `delete-stale-rooms` (6 h,
+  */15) + `clean-rate-limits` live.
+
+**Left**: Phase 2 rooms (PROTOCOL.md contract → server + client agents → Playwright gate).
