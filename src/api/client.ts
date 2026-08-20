@@ -13,7 +13,7 @@ import type {
   StateResponse,
 } from './types.ts'
 
-const ANON_KEY: string = import.meta.env.VITE_SUPABASE_ANON_KEY
+import { SUPABASE_ANON_KEY as ANON_KEY } from './config.ts'
 
 function headers(): Record<string, string> {
   return {

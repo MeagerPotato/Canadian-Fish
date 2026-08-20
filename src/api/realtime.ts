@@ -12,12 +12,13 @@
  * from GET /state, which is authenticated by the caller's playerToken.
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from './config.ts'
 
 let client: SupabaseClient | null = null
 
 function getClient(): SupabaseClient {
   if (!client) {
-    client = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY, {
+    client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: { persistSession: false, autoRefreshToken: false },
     })
   }
