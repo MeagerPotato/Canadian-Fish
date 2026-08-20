@@ -44,3 +44,22 @@ export { publicView, seatView } from './views.ts'
 export { checkInvariants } from './invariants.ts'
 export { legalAsks, legalAsksFromView, legalActionsSummary } from './helpers.ts'
 export type { AskableView } from './helpers.ts'
+export {
+  decide,
+  buildKnowledge,
+  holderOf,
+  candidates,
+  certainCards,
+  rankAsks,
+  rankAsksWith,
+  askHitProbability,
+  refinedHitProbability,
+} from './bots/index.ts'
+export type {
+  SeatView,
+  BotDifficulty,
+  Knowledge,
+  KnowledgeConstraint,
+  KnowledgeOptions,
+  RankedAsk,
+} from './bots/index.ts'

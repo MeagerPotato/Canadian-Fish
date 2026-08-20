@@ -6,7 +6,7 @@ import type { PublicRoomState } from '../../server/protocol.ts'
 import { MemDeps } from './memdeps.ts'
 import { broadcastCardViolations, get, post } from './util.ts'
 
-describe('bots.decide (placeholder policy)', () => {
+describe('bots.decide (inference bots, server chain contract)', () => {
   it('is deterministic for a given view and seed', () => {
     const g = newGame('bot-determinism')
     const view = seatView(g, 0)
@@ -43,7 +43,11 @@ describe('bots.decide (placeholder policy)', () => {
  * A hand layout where every possible ask misses forever: team A (bot seats 2,4)
  * holds ALL the LOW cards, team B (bot seats 1,3,5) ALL the HIGH cards, no seat
  * holds a complete book, and the human seat 0 is out of cards (so bots can
- * never hand the turn to a human). The bot chain must hit the 60-step cap.
+ * never hand the turn to a human). With EASY bots (no deduction, and a
+ * deadlock breaker that only fires after ~120 claim-less events) the chain is
+ * guaranteed to spend 60+ straight steps asking, hitting the per-request cap.
+ * (Medium/hard bots see through this position and claim out of it — that
+ * behavior is covered by tests/bots/.)
  */
 function endlessMissHands(): Card[][] {
   const h: Card[][] = [
@@ -57,8 +61,11 @@ function endlessMissHands(): Card[][] {
   return h.map(sortHand)
 }
 
-async function botRoom(deps: MemDeps): Promise<{ code: string; token: string }> {
-  const created = await post(deps, '/api/create-room', { name: 'Solo', fillBots: 5 })
+async function botRoom(
+  deps: MemDeps,
+  botDifficulty: 'easy' | 'medium' | 'hard' = 'medium',
+): Promise<{ code: string; token: string }> {
+  const created = await post(deps, '/api/create-room', { name: 'Solo', fillBots: 5, botDifficulty })
   expect(created.status).toBe(200)
   const code = created.body.code as string
   const token = created.body.playerToken as string
@@ -112,7 +119,7 @@ describe('bot chain', () => {
 
   it('caps at 60 steps per request and heartbeats resume the chain', async () => {
     const deps = new MemDeps()
-    const { code, token } = await botRoom(deps)
+    const { code, token } = await botRoom(deps, 'easy')
     const row = deps.rowByCode(code)
     const game = row.state.game as GameState
     row.state.game = { ...game, hands: endlessMissHands(), turn: 1 as Seat }
@@ -152,7 +159,7 @@ describe('bot chain', () => {
     // Identical seeds per moveIndex: replaying from the same crafted position
     // yields the identical bot moves (chain determinism).
     const deps2 = new MemDeps()
-    const room2 = await botRoom(deps2)
+    const room2 = await botRoom(deps2, 'easy')
     const row2 = deps2.rowByCode(room2.code)
     row2.state.game = { ...(row2.state.game as GameState), hands: endlessMissHands(), turn: 1 as Seat }
     row2.state.roomSeed = deps.rowByCode(code).state.roomSeed // same seed => same stream

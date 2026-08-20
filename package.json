@@ -11,7 +11,8 @@
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint . --max-warnings 0",
     "e2e": "playwright test",
-    "harness": "node scripts/harness.mjs"
+    "harness": "node scripts/harness.mjs",
+    "sim": "node scripts/simulate.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",

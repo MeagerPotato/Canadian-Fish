@@ -76,3 +76,30 @@ Append-only log. One entry per phase: what was built, what was verified, proof, 
   hand-free; every other seat's exact hand serialization absent from each context's traffic.
 
 **Left**: Phase 3 bots → Phase 4 practice → Phase 5 club research/pages → Phase 6 red team → prod deploy.
+
+---
+
+## Phase 3 — Inference bots (2026-08-20) — GATE 3 PASSED
+
+**Built**
+- `lib/engine/bots/`: knowledge engine over deal-time-holder variables (facts + ≥1-of-set ask
+  constraints translated through the public position map; propagation: count exhaustion/forcing,
+  single-candidate elimination, constraint forcing) — `buildKnowledge`, `holderOf`, `candidates`,
+  `rankAsks` (scored + human-readable reasons, for the Phase-4 coach), hit probabilities.
+- `decide(view, difficulty, seed)` — easy (6-event window, no constraints, ε=0.25), medium (full
+  deduction, certain claims only), hard (medium + EV claims at p≥0.8, info-leak tiebreak,
+  stalemate-breaker signalling, endgame counting). Stateless, deterministic, SeatView-only, never
+  throws, validated + fallback. `server/bots.ts` now delegates to it.
+- `scripts/simulate.mjs` (Node 24 native TS strip) + 19 new tests (public-view proof via Proxy
+  path-recording + JSON-clone equality + import allowlist; determinism; 500-position legality;
+  300-game knowledge-vs-ground-truth sweep; tier behavior).
+
+**Verified (output printed in transcript)**
+- 153 tests green, typecheck 0, lint 0.
+- GATE 3 table (first-party `npm run sim`, 1000 games/pairing, deterministic, 29.9 s): hard-vs-easy
+  **999/0/1**, hard-vs-medium **446/306/248 (59.3% of decided)**, medium-vs-easy **1000/0/0**,
+  mirrors 47.7/50.6/46.6% — 6000 games, 1.23 M moves, 0 illegal fallbacks, 0 step-cap hits.
+- Edge function **v3** deployed (real bots live); solo-room smoke: hard-bot chain played and
+  returned the turn to the human, 0 void bot claims.
+
+**Left**: Phase 4 practice drills → Phase 5 → Phase 6 → prod deploy (MANUAL_TODO #2).

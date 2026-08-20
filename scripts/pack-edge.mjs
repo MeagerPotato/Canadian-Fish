@@ -15,7 +15,7 @@ const entry = readFileSync(join(root, 'supabase/functions/api/index.ts'), 'utf8'
   .replaceAll("'../../../server/", "'./server/");
 files.push({ name: 'index.ts', content: entry });
 
-for (const dir of ['server', 'lib/engine']) {
+for (const dir of ['server', 'lib/engine', 'lib/engine/bots']) {
   for (const f of readdirSync(join(root, dir))) {
     if (!f.endsWith('.ts')) continue;
     files.push({ name: `${dir}/${f}`, content: readFileSync(join(root, dir, f), 'utf8') });
