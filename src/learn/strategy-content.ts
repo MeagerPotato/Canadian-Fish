@@ -332,13 +332,21 @@ export const SECTIONS: StrategySection[] = [
         lead: 'Notes are banned everywhere.',
         text: 'pagat is explicit that no written records are allowed — memory is the point. Bryn Mawr’s pause button doubles as the only sanctioned recall time on record.',
         sources: ['pagat', 'brynmawr'],
-        inApp: 'Our UI has no notes field by design (RULES.md row 18); the public log is shown because everything in it was public when it happened — purist tables switch on strict memory (T10) to show only the last ask.',
+        inApp:
+          'Our UI has no notes field by design (RULES.md row 18); the public log is shown because everything in it was public when it happened. A purist last-ask-only mode is reserved as flag T10 (strictMemory), but it is not built: the flag is declared on the engine config and read nowhere, so the app has one log mode and it is the full one.',
       },
     ],
   },
 ]
 
-/** Variants — attributed, with the matching engine toggle where we have one. */
+/**
+ * Variants — attributed, each with an honest note on what this app actually does.
+ *
+ * `inApp` describes shipped behaviour. A flag that merely exists on `RulesConfig.toggles` is NOT
+ * shipped behaviour: only T5 (`highBooksDouble`) and T6 (`askOwnCardAllowed`) are read by any code
+ * (RULES.md §5). Naming any other flag here as though it plays the variant is a false claim on a
+ * live public page, so those entries say plainly that the flag is declared but not implemented.
+ */
 export interface VariantItem {
   lead: string
   text: string
@@ -357,7 +365,8 @@ export const VARIANTS: VariantItem[] = [
     lead: '54 cards with jokers.',
     text: 'Add two jokers and keep the 8s as a ninth eights-and-jokers set — the US student standard, and the default in the Litaf implementation (first to 5 sets).',
     sources: ['pagat', 'cornell', 'se', 'litaf'],
-    inApp: 'Engine toggle T1 (jokers), off by default.',
+    inApp:
+      'Not built. Flag T1 (jokers) is declared on the engine config but read nowhere, so setting it changes nothing — the deck is a fixed 48 cards and eight half-suit sets. This app plays the 48-card baseline only.',
   },
   {
     lead: '7s-out, ace-low ("Lit").',
@@ -369,25 +378,29 @@ export const VARIANTS: VariantItem[] = [
     lead: 'Rank-quartet sets and the 2s-out deck.',
     text: 'The older Wikipedia text preserves a 13-set variant where a set is all four cards of one rank, and a 2s-out deck with LOW running 3–8.',
     sources: ['oldwiki'],
-    inApp: 'Rank-quartets exist as engine toggle T2; the 2s-out deck does not.',
+    inApp:
+      'Neither is built. Flag T2 (rankQuartet) is declared on the engine config but read nowhere — sets are always half-suits — and the 2s-out deck does not exist.',
   },
   {
     lead: 'Weighted scoring.',
     text: 'pagat lists scoring majors 2 / minors 1 to cut ties, and a 52-card version with 7-card major sets.',
     sources: ['pagat'],
-    inApp: 'HIGH-books-double is engine toggle T5.',
+    inApp:
+      'HIGH-books-double is engine toggle T5 — one of the two toggles that is genuinely implemented (the scorer reads it), though it is off by default with no UI exposure in v1.',
   },
   {
     lead: 'Out-of-turn declares.',
     text: 'Letting anyone declare at any time — with a wrong declare awarded to the opponents — is the US student dialect, listed as a variant on pagat and required by Develin’s own-team-only declare discussion.',
     sources: ['develin', 'se', 'amylei', 'cornell', 'pagat'],
-    inApp: 'Claim-on-any-turn is engine toggle T8 (our resolution stays RULES.md §3).',
+    inApp:
+      'Not built. Flag T8 (claimAnyTurn) is declared on the engine config but read nowhere: claims are legal on your own turn only, and resolution stays RULES.md §3.',
   },
   {
     lead: 'The Bryn Mawr dialect.',
     text: 'Teams drawn by high/low cards, abortable claims, a pause button, and the no-history rule — a complete self-consistent house culture.',
     sources: ['brynmawr'],
-    inApp: 'Strict memory (T10) is our nearest relative: UI shows only the last ask.',
+    inApp:
+      'Flag T10 (strictMemory) is the nearest relative on paper, but it is declared and unread — the UI always shows the full public log.',
   },
   {
     lead: 'Fish as an institution.',

@@ -96,23 +96,31 @@ Resolution order (public event reveals the **actual** holders in every case):
   claimant (they have the turn; if the claim also emptied the claimant but teammates have cards,
   `awaitPass` resolves first, then `endgame`).
 
-## 5. Optional toggles — implemented as engine config flags, ALL OFF by default
+## 5. Optional toggles — declared on the engine config, ALL OFF by default
 
-| Flag | Variant |
-|---|---|
-| T1 `jokers` | 54 cards: add 2 jokers + keep 8s as "eights & jokers" 9th book → 9 books of 6 |
-| T2 `rankQuartet` | Books are rank-quartets (all four 9s, etc.) instead of half-suits |
-| T3 `mandatoryDeclare` | A completed book in one hand must be declared immediately |
-| T4 `announceLastCard` | A player down to one card must announce it |
-| T5 `highBooksDouble` | HIGH books score 2 points |
-| T6 `askOwnCardAllowed` | May ask for a card you hold (bluff ask) |
-| T7 `declarerChoosesNext` | After a successful claim the claiming team chooses who asks next |
-| T8 `claimAnyTurn` | Claims allowed on any player's turn |
-| T9 *(reserved)* | 8-player mode — deliberately **not** built (row 24) |
-| T10 `strictMemory` | UI shows only the last question/answer instead of the persistent log |
+`RulesConfig.toggles` (lib/engine/types.ts) declares the ten flags below and `defaultConfig`
+(lib/engine/reduce.ts) sets every one of them to `false`. **Declaring a flag is not implementing
+it.** Only two are read by any code today; the rest are placeholders for rules this engine does
+not yet play. The Status column is the source of truth and must be updated in the same commit as
+any change to what the code reads.
 
-Only the flags' rule effects are engine-level; T1/T2 change deck/book construction and are
-implemented behind the same `RulesConfig` without UI exposure in v1.
+| Flag | Variant | Status |
+|---|---|---|
+| T1 `jokers` | 54 cards: add 2 jokers + keep 8s as "eights & jokers" 9th book → 9 books of 6 | **Declared only** — read nowhere; setting it changes nothing |
+| T2 `rankQuartet` | Books are rank-quartets (all four 9s, etc.) instead of half-suits | **Declared only** — read nowhere |
+| T3 `mandatoryDeclare` | A completed book in one hand must be declared immediately | **Declared only** — read nowhere |
+| T4 `announceLastCard` | A player down to one card must announce it | **Declared only** — read nowhere |
+| T5 `highBooksDouble` | HIGH books score 2 points | **Implemented** — `bookPoints` (reduce.ts) and the score invariant |
+| T6 `askOwnCardAllowed` | May ask for a card you hold (bluff ask) | **Implemented** — ask legality in reduce.ts, helpers.ts, the bots and the ask picker |
+| T7 `declarerChoosesNext` | After a successful claim the claiming team chooses who asks next | **Declared only** — read nowhere |
+| T8 `claimAnyTurn` | Claims allowed on any player's turn | **Declared only** — read nowhere; claims stay own-turn-only per §3 |
+| T9 *(reserved)* | 8-player mode — deliberately **not** built (row 24) | **Not built**, by decision |
+| T10 `strictMemory` | UI shows only the last question/answer instead of the persistent log | **Declared only** — read nowhere; the UI always shows the full public log |
+
+The two implemented flags are engine-level and have no UI exposure in v1. Deck and book
+construction is **not** flag-driven: the 48-card deck and the eight half-suit books of rows 1–3
+are fixed module constants (`ALL_CARDS`, `ALL_BOOKS` in lib/engine/cards.ts). T1 and T2 would each
+require building a second deck/book model, and neither has been built.
 
 ## 6. Information rules & the public log (decision)
 
@@ -121,8 +129,9 @@ memory-only; no written records (pagat "History" rule). The build brief also req
 to show a persistent public log of asks/results and card counts. Decision (SPEC §11.1): the app
 displays the full public log by default — the app acts as the shared table state, and every entry
 it shows was public information when it happened; no player-private notes are possible (no notes
-field). Purist tables set `strictMemory` (T10) to limit the UI to the last ask only. Card counts
-are always shown. Nothing in any mode ever displays hidden card identities.
+field). `strictMemory` (T10) is the flag reserved for the purist mode that would limit the UI to
+the last ask only, but it is declared and unread (§5): the app has one log mode today, and it is
+the full one. Card counts are always shown. Nothing in any mode ever displays hidden card identities.
 
 ## 7. Worked examples (engine test vectors)
 

@@ -26,6 +26,7 @@ import {
 import type {
   ActionRequest,
   ActionShape,
+  BotChainFault,
   CodeTokenRequest,
   CreateRoomRequest,
   CreateRoomResponse,
@@ -73,6 +74,8 @@ interface BroadcastEntry {
   status: RoomStatus
   state: RoomState
   offset: number
+  /** Set on the LAST entry of a chain that died on a refusal; absent otherwise. */
+  fault?: BotChainFault
 }
 
 type MutOutcome<T> =
@@ -113,7 +116,7 @@ async function mutateRoom<T>(
         await deps.broadcast(
           topic(room.code),
           out.entries.map((e) =>
-            buildPublicRoomState(room.code, e.status, e.state, room.version + e.offset, now),
+            buildPublicRoomState(room.code, e.status, e.state, room.version + e.offset, now, e.fault ?? null),
           ),
         )
       }
@@ -125,10 +128,32 @@ async function mutateRoom<T>(
 
 /* -------------------------------------------------------------- bot chain --- */
 
+/**
+ * Why the chain stopped. Every value except `'refused'` is ordinary operation; `'refused'` is a
+ * bug, and `'capped'` is the documented per-request budget (PROTOCOL §3). Returned so the reason
+ * is assertable from a test rather than inferred from a step count.
+ */
+export type BotChainStop =
+  | 'not-playing' // the room was not `playing` — nothing to run
+  | 'paused' // a human seat is disconnected; bots wait for them (PROTOCOL §3)
+  | 'finished' // no game, or the game ended — the normal terminal exit
+  | 'human' // the seat that must act is a human (or empty) — the normal handoff
+  | 'capped' // BOT_CHAIN_CAP steps used this request; a heartbeat resumes the chain
+  | 'refused' // reduce() rejected the bot's action — see BotChainFault
+
 interface ChainResult {
   status: RoomStatus
   state: RoomState
   steps: { status: RoomStatus; state: RoomState }[]
+  stop: BotChainStop
+  /** Non-null iff `stop === 'refused'`. Rides the last broadcast entry so clients see it. */
+  fault: BotChainFault | null
+}
+
+/** The room identity a chain needs purely so its log lines name the room they came from. */
+export interface ChainRoomRef {
+  id: string
+  code: string
 }
 
 /**
@@ -136,31 +161,117 @@ interface ChainResult {
  * that bot's SeatView (public data only), seeded by hash(roomSeed, moveIndex),
  * reduce, and record one step. Capped at BOT_CHAIN_CAP per request; heartbeats
  * resume a capped chain (PROTOCOL §3).
+ *
+ * A refusal ends the chain — re-deciding is deterministic, so retrying would spin on the same
+ * rejected action — but it does **not** end it quietly. This used to be a bare
+ * `if (!r.ok) break`, which abandoned the chain without a trace: the room stayed
+ * `status: 'playing'` with a bot on the turn that could not move, so it hung there forever and
+ * GameOver never rendered. Nothing in the logs, the broadcast, or the status said why. The
+ * refusal is now reported three ways — an operator `console.error`, a `BotChainFault` on the
+ * broadcast, and `stop: 'refused'` on the result.
+ *
+ * **The room deliberately stays `playing`.** `finished` would fabricate an outcome: GameOver
+ * would render a winner from a game that has not ended, with hands and scores mid-play. A new
+ * `'errored'` status is not available without a migration — `RoomStatus` (server/deps.ts) is
+ * pinned by `check (status in ('lobby','playing','finished'))`
+ * (supabase/migrations/0001_init_rooms_rls_expiry.sql:9), so writing one would fail the CAS save
+ * and turn every subsequent request into a 409, a worse and noisier hang. Staying `playing` also
+ * keeps the stall self-healing: each heartbeat re-runs the chain, which either recovers (the
+ * refusal may have depended on transient state) or re-raises the alarm.
  */
-function runBotChain(status: RoomStatus, state: RoomState, now: number): ChainResult {
+export function runBotChain(
+  status: RoomStatus,
+  state: RoomState,
+  now: number,
+  room: ChainRoomRef,
+): ChainResult {
   const steps: { status: RoomStatus; state: RoomState }[] = []
   let curStatus = status
   let cur = state
-  if (curStatus === 'playing' && !computePaused(curStatus, cur, now)) {
-    while (steps.length < BOT_CHAIN_CAP) {
-      const game = cur.game
-      if (curStatus !== 'playing' || game === null || game.phase === 'finished') break
-      const meta = cur.seats[game.turn]
-      if (meta === null || !meta.isBot) break
-      const seed = hashSeed(`${cur.roomSeed}:${game.moveIndex}`)()
-      const action = decide(seatView(game, game.turn), meta.botDifficulty ?? 'medium', seed)
-      const r = reduce(game, action)
-      if (!r.ok) break // defensive: the placeholder bot only emits legal actions
-      curStatus = r.state.phase === 'finished' ? 'finished' : 'playing'
-      cur = { ...cur, game: r.state }
-      steps.push({ status: curStatus, state: cur })
-    }
+  let fault: BotChainFault | null = null
+  if (curStatus !== 'playing') {
+    return { status: curStatus, state: cur, steps, stop: 'not-playing', fault }
   }
-  return { status: curStatus, state: cur, steps }
+  if (computePaused(curStatus, cur, now)) {
+    return { status: curStatus, state: cur, steps, stop: 'paused', fault }
+  }
+  // Seeded with 'capped': it is the only exit that does not break out of the loop, so it is the
+  // reason left standing when the budget runs out.
+  let stop: BotChainStop = 'capped'
+  while (steps.length < BOT_CHAIN_CAP) {
+    const game = cur.game
+    if (curStatus !== 'playing' || game === null || game.phase === 'finished') {
+      stop = 'finished'
+      break
+    }
+    const actor = game.turn
+    const meta = cur.seats[actor]
+    if (meta === null || !meta.isBot) {
+      stop = 'human'
+      break
+    }
+    const seed = hashSeed(`${cur.roomSeed}:${game.moveIndex}`)()
+    const action = decide(seatView(game, actor), meta.botDifficulty ?? 'medium', seed)
+    const r = reduce(game, action)
+    if (!r.ok) {
+      stop = 'refused'
+      fault = {
+        reason: 'refused',
+        seat: actor,
+        phase: game.phase,
+        moveIndex: game.moveIndex,
+        actionType: action.type,
+        code: r.error.code,
+      }
+      // Operator-facing and deliberately noisy — the whole point is that this can never again be
+      // an invisible stall. Carries the full action (cards included): server logs are not the
+      // public broadcast, and without the payload the refusal is not diagnosable.
+      console.error('bot chain refused a bot action — the room is stuck', {
+        room: room.id,
+        code: room.code,
+        seat: actor,
+        turn: game.turn,
+        phase: game.phase,
+        moveIndex: game.moveIndex,
+        action,
+        errorCode: r.error.code,
+        errorMessage: r.error.message,
+      })
+      break
+    }
+    curStatus = r.state.phase === 'finished' ? 'finished' : 'playing'
+    cur = { ...cur, game: r.state }
+    steps.push({ status: curStatus, state: cur })
+  }
+  if (stop === 'capped') {
+    // Expected under long bot-only stretches — a heartbeat resumes it. Logged anyway so a chain
+    // that caps forever, i.e. a livelock rather than a budget, shows up in the logs instead of
+    // only in a step count.
+    console.warn('bot chain hit the per-request cap', {
+      room: room.id,
+      code: room.code,
+      cap: BOT_CHAIN_CAP,
+      moveIndex: cur.game?.moveIndex ?? null,
+    })
+  }
+  return { status: curStatus, state: cur, steps, stop, fault }
 }
 
-function chainEntries(base: BroadcastEntry, steps: { status: RoomStatus; state: RoomState }[]): BroadcastEntry[] {
-  return [base, ...steps.map((s, i) => ({ status: s.status, state: s.state, offset: base.offset + 1 + i }))]
+/**
+ * base + one entry per chain step. A refusal fault is stamped on the LAST entry — the snapshot
+ * clients keep — so it reaches them without disturbing the versions of the steps that did land.
+ */
+function chainEntries(
+  base: BroadcastEntry,
+  steps: { status: RoomStatus; state: RoomState }[],
+  fault: BotChainFault | null = null,
+): BroadcastEntry[] {
+  const entries: BroadcastEntry[] = [
+    base,
+    ...steps.map((s, i) => ({ status: s.status, state: s.state, offset: base.offset + 1 + i })),
+  ]
+  if (fault !== null) entries[entries.length - 1] = { ...entries[entries.length - 1], fault }
+  return entries
 }
 
 /* ------------------------------------------------------------ create-room --- */
@@ -365,13 +476,13 @@ export async function startRoom(
       return failure(409, 'NOT_FULL', 'all 6 seats must be filled to start')
     }
     const started: RoomState = { ...room.state, game: newGame(room.state.roomSeed) }
-    const chain = runBotChain('playing', started, now)
+    const chain = runBotChain('playing', started, now, room)
     return {
       ok: true,
       status: chain.status,
       state: chain.state,
       increment: 1 + chain.steps.length,
-      entries: chainEntries({ status: 'playing', state: started, offset: 1 }, chain.steps),
+      entries: chainEntries({ status: 'playing', state: started, offset: 1 }, chain.steps, chain.fault),
       response: {},
     }
   })
@@ -418,13 +529,13 @@ export async function actRoom(
     if (!r.ok) return failure(400, r.error.code, r.error.message)
     const statusAfter: RoomStatus = r.state.phase === 'finished' ? 'finished' : 'playing'
     const afterHuman: RoomState = { ...room.state, game: r.state }
-    const chain = runBotChain(statusAfter, afterHuman, now)
+    const chain = runBotChain(statusAfter, afterHuman, now, room)
     return {
       ok: true,
       status: chain.status,
       state: chain.state,
       increment: 1 + chain.steps.length,
-      entries: chainEntries({ status: statusAfter, state: afterHuman, offset: 1 }, chain.steps),
+      entries: chainEntries({ status: statusAfter, state: afterHuman, offset: 1 }, chain.steps, chain.fault),
       response: {},
     }
   })
@@ -456,12 +567,15 @@ export async function heartbeat(
       const meta = state.seats[seat]
       if (meta !== null && !meta.isBot) state = { ...state, pendingVote: null }
     }
-    const chain = runBotChain(room.status, state, now)
+    const chain = runBotChain(room.status, state, now, room)
     const postKey = connectionKey(chain.status, chain.state, now)
-    const publicChanged = postKey !== preKeyNow || preKeyNow !== preKeyPast
+    // A refusal forces the broadcast: it is the one thing worth telling clients about that the
+    // connectivity fingerprint cannot see, and a silent heartbeat is exactly how the stall stayed
+    // invisible.
+    const publicChanged = postKey !== preKeyNow || preKeyNow !== preKeyPast || chain.fault !== null
     const base: BroadcastEntry = { status: room.status, state, offset: 1 }
     const entries = publicChanged
-      ? chainEntries(base, chain.steps)
+      ? chainEntries(base, chain.steps, chain.fault)
       : chain.steps.map((s, i) => ({ status: s.status, state: s.state, offset: 2 + i }))
     const increment = 1 + chain.steps.length
     return {
@@ -531,15 +645,15 @@ export async function voteBot(
       )
       state = { ...state, seats, pendingVote: null }
     }
-    const chain = substituted
-      ? runBotChain(room.status, state, now)
-      : { status: room.status, state, steps: [] }
+    const chain: Pick<ChainResult, 'status' | 'state' | 'steps' | 'fault'> = substituted
+      ? runBotChain(room.status, state, now, room)
+      : { status: room.status, state, steps: [], fault: null }
     return {
       ok: true,
       status: chain.status,
       state: chain.state,
       increment: 1 + chain.steps.length,
-      entries: chainEntries({ status: room.status, state, offset: 1 }, chain.steps),
+      entries: chainEntries({ status: room.status, state, offset: 1 }, chain.steps, chain.fault),
       response: {},
     }
   })

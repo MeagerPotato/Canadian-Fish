@@ -3,7 +3,7 @@
  * PublicRoomState builder (PROTOCOL.md §3/§4/§6). Pure functions only.
  */
 import { publicView } from '../lib/engine/index.ts'
-import type { Card, PublicState, Seat } from '../lib/engine/index.ts'
+import type { Card, Phase, PublicState, Seat } from '../lib/engine/index.ts'
 import type { BotDifficulty, RoomState, RoomStatus, SeatMeta } from './deps.ts'
 
 /* ------------------------------------------------------------- constants --- */
@@ -54,7 +54,39 @@ export interface PublicPendingVote {
   needed: number
 }
 
-/** Full public snapshot broadcast on `room:{CODE}` and embedded in GET /state. */
+/**
+ * A bot chain that stopped because `reduce` **refused** the bot's action (room.ts `runBotChain`).
+ *
+ * This must never happen: the bot module's contract is that it only ever emits actions the
+ * reducer accepts. When it does happen the room is genuinely stuck — the seat that must act is a
+ * bot, and that bot cannot move — so the failure has to be *visible* rather than the silent
+ * `if (!r.ok) break` it used to be.
+ *
+ * **Privacy**: this rides on the public broadcast, so it names only the *kind* of action and the
+ * engine's error code. The refused action's cards/assignments were never publicly announced (the
+ * move was rejected), so putting them here would leak a bot's hidden hand to every client. The
+ * full action goes to the server-side `console.error` instead, which only the operator reads.
+ */
+export interface BotChainFault {
+  /** Only `'refused'` today; the field exists so a future loud stop reason stays parseable. */
+  reason: 'refused'
+  /** The seat that had to act — the turn-holder. */
+  seat: Seat
+  phase: Phase
+  moveIndex: number
+  /** `GameAction['type']` of the refused action. Never its payload — see above. */
+  actionType: string
+  /** The `ErrorCode` reduce answered with, e.g. `NOT_YOUR_TURN`. */
+  code: string
+}
+
+/**
+ * Full public snapshot broadcast on `room:{CODE}` and embedded in GET /state.
+ *
+ * `botFault` is **absent** (not `null`) on every healthy snapshot, so a room that is working
+ * normally serializes byte-identically to what it did before this field existed and the
+ * documented wire shape is unchanged (PROTOCOL.md §4, tests/server/protocol-shape.test.ts).
+ */
 export interface PublicRoomState {
   code: string
   status: RoomStatus
@@ -64,6 +96,7 @@ export interface PublicRoomState {
   pendingVote: PublicPendingVote | null
   game: PublicState | null
   version: number
+  botFault?: BotChainFault
 }
 
 export function seatConnected(meta: SeatMeta | null, now: number): boolean {
@@ -101,6 +134,7 @@ export function buildPublicRoomState(
   state: RoomState,
   version: number,
   now: number,
+  fault: BotChainFault | null = null,
 ): PublicRoomState {
   return {
     code,
@@ -117,6 +151,9 @@ export function buildPublicRoomState(
     pendingVote: voteTally(state, now),
     game: state.game === null ? null : publicView(state.game),
     version,
+    // Spreads *nothing* when healthy, so the snapshot keeps exactly the eight documented keys
+    // (PROTOCOL.md §4) and tests/server/protocol-shape.test.ts still holds.
+    ...(fault === null ? {} : { botFault: fault }),
   }
 }
 
